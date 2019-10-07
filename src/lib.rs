@@ -1,5 +1,3 @@
-//use regex::Regex;
-
 #[macro_export]
 macro_rules! regex {
     ($s: literal) => {{

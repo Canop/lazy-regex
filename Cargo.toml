@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2018"
 description = "a macro to reduce regex creation boilerplate"
@@ -10,6 +10,5 @@ categories = ["text-processing"]
 readme = "README.md"
 
 [dependencies]
-regex = "1"
 lazy_static = "1"
 
