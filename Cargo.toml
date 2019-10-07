@@ -1,0 +1,15 @@
+[package]
+name = "lazy-regex"
+version = "0.1.0"
+authors = ["Canop <cano.petrole@gmail.com>"]
+edition = "2018"
+description = "a macro to reduce regex creation boilerplate"
+keywords = ["macro", "lazy_static", "regex"]
+license = "MIT"
+categories = ["text-processing"]
+readme = "README.md"
+
+[dependencies]
+regex = "1"
+lazy_static = "1"
+
