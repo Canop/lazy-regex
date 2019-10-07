@@ -1,12 +1,13 @@
 [package]
 name = "lazy-regex"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2018"
 description = "a macro to reduce regex creation boilerplate"
 keywords = ["macro", "lazy_static", "regex"]
 license = "MIT"
 categories = ["text-processing"]
+repository = "https://github.com/Canop/lazy-regex"
 readme = "README.md"
 
 [dependencies]
