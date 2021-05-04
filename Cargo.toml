@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex"
-version = "0.1.4"
+version = "1.0.0"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2018"
 description = "a macro to reduce regex creation boilerplate"
