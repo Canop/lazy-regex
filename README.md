@@ -33,7 +33,8 @@ The first code comes from the regex documentation.
 
 ### Is it really useful ?
 
-Regarding the binary, it's *exactly* as using lazy_static. It just makes some code a little easier to read. You're judge.
+Regarding the binary, it's as using lazy_static or once_cell.
+It just makes some code a little easier to read. You're judge.
 
 ### Can I have several `regex!` in the same function ? On the same Line ?
 
@@ -49,4 +50,4 @@ You mean something like `regex!("somestring", "i")` ? Cool. I was just waiting f
 
 ### What's the licence ?
 
-It's MIT. But you're also free to just copy the macro in your code if it's simpler, no attribution is needed.
+It's MIT. No attribution is needed.

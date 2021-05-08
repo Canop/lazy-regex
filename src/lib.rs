@@ -26,13 +26,13 @@ fn some_helper_function(text: &str) -> bool {
 
 */
 
+pub use once_cell;
+
 #[macro_export]
 macro_rules! regex {
     ($s: literal) => {{
-        use regex::Regex;
-        lazy_static! {
-            static ref RE: Regex = Regex::new($s).unwrap();
-        }
-        &*RE
+        use lazy_regex::once_cell::sync::OnceCell;
+        static RE: OnceCell::<regex::Regex> = OnceCell::new();
+        RE.get_or_init(|| regex::Regex::new($s).unwrap())
     }};
 }

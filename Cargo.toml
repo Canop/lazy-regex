@@ -1,15 +1,16 @@
 [package]
 name = "lazy-regex"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2018"
 description = "a macro to reduce regex creation boilerplate"
-keywords = ["macro", "lazy_static", "regex"]
+keywords = ["macro", "lazy", "static", "regex"]
 license = "MIT"
 categories = ["text-processing"]
 repository = "https://github.com/Canop/lazy-regex"
 readme = "README.md"
 
 [dependencies]
-lazy_static = "1"
+once_cell = "1.7"
+regex = "1.4"
 
