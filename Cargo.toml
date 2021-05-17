@@ -1,9 +1,9 @@
 [package]
 name = "lazy-regex"
-version = "1.1.0"
+version = "2.0.0"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2018"
-description = "a macro to reduce regex creation boilerplate"
+description = "lazy static regular expressions checked at compile time"
 keywords = ["macro", "lazy", "static", "regex"]
 license = "MIT"
 categories = ["text-processing"]
@@ -12,5 +12,12 @@ readme = "README.md"
 
 [dependencies]
 once_cell = "1.7"
-regex = "1.4"
+regex = "1.5"
 
+[dependencies.proc_macros]
+package = "lazy-regex-proc_macros"
+path = "src/proc_macros"
+version = "2.0.0"
+
+[workspace]
+members = ["src/proc_macros", "examples/regexes"]

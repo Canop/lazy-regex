@@ -1,53 +1,82 @@
 # lazy-regex
-a macro for when you're tired of the regex creation boilerplate
 
-## What it does
+Use the  `regex!` macro to build regexes:
 
-It's a shortcut to write static lazily compiled regular expressions as is usually done with lazy_static or once_cell.
+* they're checked at compile time
+* they're wrapped in `once_cell` lazy static initializers so that they're compiled only once
+* they can hold flags with a familiar suffix syntax: `let case_insensitive_regex = regex!("ab*"i);`
+* regex creation is less verbose
 
-It lets you replace
+This macro builds normal instances of `regex::Regex` so all the usual features are available.
 
+You may also use shortcut macros for testing a match or capturing groups as substrings:
 
-```
-fn some_helper_function(text: &str) -> bool {
-    lazy_static! {
-        static ref RE: Regex = Regex::new("...").unwrap();
-    }
-    RE.is_match(text)
-}
-```
+* `regex_is_match!`
+* `regex_find!`
+* `regex_captures!`
 
-with
-
+# Build Regexes
 
 ```
-fn some_helper_function(text: &str) -> bool {
-    regex!("...").is_match(text)
-}
+use lazy_regex::regex;
+
+// build a simple regex
+let r = regex!("sa+$");
+assert_eq!(r.is_match("Saa"), false);
+
+// build a regex with flag(s)
+let r = regex!("sa+$"i);
+assert_eq!(r.is_match("Saa"), true);
+
+// supported regex flags: 'i', 'm', 's', 'x', 'U'
+// see https://docs.rs/regex/1.5.4/regex/struct.RegexBuilder.html
+
+// you can use a raw literal
+let r = regex!(r#"^"+$"#);
+assert_eq!(r.is_match("\"\""), true);
+
+// or a raw literal with flag(s)
+let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
+assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
+
+// this line wouldn't compile:
+// let r = regex!("(unclosed");
+
 ```
 
-The first code comes from the regex documentation.
+# Test a match
 
+```
+use lazy_regex::regex_is_match;
 
-## FAQ
+let b = regex_is_match!("[ab]+", "car");
+assert_eq!(b, true);
+```
 
-### Is it really useful ?
+# Extract a value
 
-Regarding the binary, it's as using lazy_static or once_cell.
-It just makes some code a little easier to read. You're judge.
+```
+use lazy_regex::regex_find;
 
-### Can I have several `regex!` in the same function ? On the same Line ?
+let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.").unwrap();
+assert_eq!(f_word, "fox");
+```
 
-Yes, no problem.
+# Capture
 
-### It hides the `unwrap()`, isn't it concerning ?
+```
+use lazy_regex::regex_captures;
 
-Not so much in my opinion as the macro only accepts a litteral: you won't hide a failure occuring on a dynamic string.
+let (_, letter) = regex_captures!(r#"([a-z])\d+"#i, "form A42").unwrap();
+assert_eq!(letter, "A");
 
-### I'd like to have flags too
+let (whole, name, version) = regex_captures!(
+    r#"(\w+)-([0-9.]+)"#, // a literal regex
+    "This is lazy_regex-2.0!", // any expression
+).unwrap();
+assert_eq!(whole, "lazy_regex-2.0");
+assert_eq!(name, "lazy_regex");
+assert_eq!(version, "2.0");
+```
 
-You mean something like `regex!("somestring", "i")` ? Cool. I was just waiting for somebody's else to ask for it. Create an issue and I'll see if I can easily wrap `RegexBuilder` to handle flags ala JavaScript.
-
-### What's the licence ?
-
-It's MIT. No attribution is needed.
+The size of the tupple is checked at compile time and ensures you have the right number of capturing groups.
