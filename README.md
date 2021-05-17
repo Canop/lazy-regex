@@ -32,7 +32,7 @@ You may also use shortcut macros for testing a match or capturing groups as subs
 
 # Build Regexes
 
-```
+```rust
 use lazy_regex::regex;
 
 // build a simple regex
@@ -61,7 +61,7 @@ assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 
 # Test
 
-```
+```rust
 use lazy_regex::regex_is_match;
 
 let b = regex_is_match!("[ab]+", "car");
@@ -70,7 +70,7 @@ assert_eq!(b, true);
 
 # Extract
 
-```
+```rust
 use lazy_regex::regex_find;
 
 let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.").unwrap();
@@ -79,7 +79,7 @@ assert_eq!(f_word, "fox");
 
 # Capture
 
-```
+```rust
 use lazy_regex::regex_captures;
 
 let (_, letter) = regex_captures!(r#"([a-z])\d+"#i, "form A42").unwrap();
