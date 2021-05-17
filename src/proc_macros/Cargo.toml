@@ -2,13 +2,15 @@
 name = "lazy-regex-proc_macros"
 version = "2.0.0"
 authors = ["Canop <cano.petrole@gmail.com>"]
+description = "proc macros for the lazy_regex crate"
+license = "MIT"
 edition = "2018"
 
 [dependencies]
 syn = "1.0"
 proc-macro2 = "1.0"
 quote = "1.0"
-regex = "1.4"
+regex = "1.5"
 
 [lib]
 proc-macro = true
