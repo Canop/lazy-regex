@@ -19,7 +19,7 @@ Use the  `regex!` macro to build regexes:
 
 * they're checked at compile time
 * they're wrapped in `once_cell` lazy static initializers so that they're compiled only once
-* they can hold flags with a familiar suffix syntax: `let case_insensitive_regex = regex!("ab*"i);`
+* they can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
 * regex creation is less verbose
 
 This macro builds normal instances of `regex::Regex` so all the usual features are available.
@@ -59,7 +59,7 @@ assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 
 ```
 
-# Test a match
+# Test
 
 ```
 use lazy_regex::regex_is_match;
@@ -68,7 +68,7 @@ let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
 ```
 
-# Extract a value
+# Extract
 
 ```
 use lazy_regex::regex_find;
