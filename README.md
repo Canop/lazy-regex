@@ -96,4 +96,4 @@ assert_eq!(name, "lazy_regex");
 assert_eq!(version, "2.0");
 ```
 
-The size of the tupple is checked at compile time and ensures you have the right number of capturing groups.
+The size of the tuple is checked at compile time and ensures you have the right number of capturing groups.
