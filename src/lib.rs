@@ -28,7 +28,6 @@ assert_eq!(r.is_match("Saa"), false);
 let r = regex!("sa+$"i);
 assert_eq!(r.is_match("Saa"), true);
 
-
 // you can use a raw literal
 let r = regex!(r#"^"+$"#);
 assert_eq!(r.is_match("\"\""), true);

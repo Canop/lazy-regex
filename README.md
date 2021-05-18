@@ -59,6 +59,8 @@ assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 
 ```
 
+What you really get from this macro call is a reference to a `regex::Regex`, statically checked, and behind a static `once_cell` lazy initializer.
+
 # Test
 
 ```rust
