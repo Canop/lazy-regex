@@ -75,8 +75,8 @@ assert_eq!(b, true);
 ```rust
 use lazy_regex::regex_find;
 
-let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.").unwrap();
-assert_eq!(f_word, "fox");
+let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
+assert_eq!(f_word, Some("fox"));
 ```
 
 # Capture
@@ -84,7 +84,7 @@ assert_eq!(f_word, "fox");
 ```rust
 use lazy_regex::regex_captures;
 
-let (_, letter) = regex_captures!(r#"([a-z])\d+"#i, "form A42").unwrap();
+let (_, letter) = regex_captures!("([a-z])[0-9]+"i, "form A42").unwrap();
 assert_eq!(letter, "A");
 
 let (whole, name, version) = regex_captures!(

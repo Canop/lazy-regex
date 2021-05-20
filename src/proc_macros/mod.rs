@@ -41,7 +41,7 @@ impl From<LitStr> for RegexCode {
             };
         }
 
-        // the next line is here to prevent compilation if the
+        // the next line prevents compilation if the
         // literal is invalid as a regular expression
         let regex = regex::Regex::new(&regex_string).unwrap();
 
@@ -76,6 +76,9 @@ pub fn regex(input: TokenStream) -> TokenStream {
     RegexCode::from(lit_str).build.into()
 }
 
+/// wrapping of the two arguments given to one of the
+/// `regex_is_match`, `regex_find`, or `regex_captures`
+/// macros.
 struct RegexAndExpr {
     regex_str: LitStr,
     value: Expr,
@@ -116,6 +119,14 @@ pub fn regex_is_match(input: TokenStream) -> TokenStream {
     q.into()
 }
 
+/// extract the leftmost match of the regex in the
+/// second argument, as a &str
+///
+/// Example:
+/// ```
+/// let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
+/// assert_eq!(f_word, Some("fox"));
+/// ```
 #[proc_macro]
 pub fn regex_find(input: TokenStream) -> TokenStream {
     let regex_and_expr_args = parse_macro_input!(input as RegexAndExpr);

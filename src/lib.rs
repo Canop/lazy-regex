@@ -4,10 +4,10 @@ Use the  [regex!] macro to build regexes:
 
 * they're checked at compile time
 * they're wrapped in `once_cell` lazy static initializers so that they're compiled only once
-* they can hold flags with a familiar suffix syntax: `let case_insensitive_regex = regex!("ab*"i);`
+* they can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
 * regex creation is less verbose
 
-This macro builds normal instances of [regex::Regex] so all the usual features are available.
+This macro returns references to normal instances of [regex::Regex] so all the usual features are available.
 
 You may also use shortcut macros for testing a match or capturing groups as substrings:
 
@@ -58,8 +58,8 @@ assert_eq!(b, true);
 ```
 use lazy_regex::regex_find;
 
-let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.").unwrap();
-assert_eq!(f_word, "fox");
+let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
+assert_eq!(f_word, Some("fox"));
 ```
 
 # Capture
@@ -67,7 +67,7 @@ assert_eq!(f_word, "fox");
 ```
 use lazy_regex::regex_captures;
 
-let (_, letter) = regex_captures!(r#"([a-z])\d+"#i, "form A42").unwrap();
+let (_, letter) = regex_captures!("([a-z])[0-9]+"i, "form A42").unwrap();
 assert_eq!(letter, "A");
 
 let (whole, name, version) = regex_captures!(

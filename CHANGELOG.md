@@ -1,3 +1,7 @@
+<a name="v2.0.1"></a>
+### v2.0.1 - 2021-05-20
+Improved documentation
+
 <a name="v2.0.0"></a>
 ### v2.0.0 - 2021-05-17
 - regular expressions are now checked at compile time

@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex"
-version = "2.0.0"
+version = "2.0.1"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2018"
 description = "lazy static regular expressions checked at compile time"
@@ -17,7 +17,7 @@ regex = "1.5"
 [dependencies.proc_macros]
 package = "lazy-regex-proc_macros"
 path = "src/proc_macros"
-version = "2.0.0"
+version = "2.0.1"
 
 [workspace]
 members = ["src/proc_macros", "examples/regexes"]
