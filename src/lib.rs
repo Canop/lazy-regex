@@ -86,7 +86,7 @@ It's checked at compile time to ensure you have the right number of capturing gr
 
 pub use {
     once_cell,
-    proc_macros::{
+    lazy_regex_proc_macros::{
         regex,
         regex_captures,
         regex_find,

@@ -14,8 +14,7 @@ readme = "README.md"
 once_cell = "1.7"
 regex = "1.5"
 
-[dependencies.proc_macros]
-package = "lazy-regex-proc_macros"
+[dependencies.lazy-regex-proc_macros]
 path = "src/proc_macros"
 version = "2.0.1"
 
