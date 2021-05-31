@@ -1,6 +1,6 @@
 [package]
 name = "regexes"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["dystroy <denys.seguret@gmail.com>"]
 edition = "2018"
 description = "An example for lazy-regex"
@@ -9,4 +9,4 @@ readme = "README.md"
 
 [dependencies]
 lazy-regex = { path = "../.." }
-regex = "1.4"
+regex = "1.5"

@@ -1,22 +1,9 @@
 
-You may launch this example in this repository with
+This example displays a few compilation regexes.
 
-```
-cargo run
-```
+To demonstrate compile time checks
 
-and that would do nothing.
+- uncomment line 24
+- run `cargo run`
 
-If you want some log, set the env var `SMALL_APP_LOG`, for example with
-
-```
-SMALL_APP_LOG=info cargo run
-```
-
-or
-
-```
-SMALL_APP_LOG=debug cargo run
-```
-
-A `small-app.log` file would thus be created.
+The program should fail to check with a clear error.

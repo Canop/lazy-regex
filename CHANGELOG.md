@@ -1,3 +1,7 @@
+<a name="v2.0.2"></a>
+### v2.0.2 - 2021-05-31
+Fix a cross compilation problem, thanks @AlephAlpha - Fix #5
+
 <a name="v2.0.1"></a>
 ### v2.0.1 - 2021-05-20
 Improved documentation
