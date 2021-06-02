@@ -2,6 +2,8 @@ use {
     lazy_regex::*,
 };
 
+pub static SHARED: Lazy<Regex> = lazy_regex!("^test$");
+
 fn example_builds() {
 
     // build a simple regex
@@ -9,7 +11,7 @@ fn example_builds() {
     assert_eq!(r.is_match("Saa"), false);
 
     // build a regex with flag(s)
-    let r = regex!("sa+$"i);
+    let r = regex!("sa+b?$"i);
     assert_eq!(r.is_match("Saa"), true);
 
     // you can use a raw literal
@@ -28,6 +30,11 @@ fn example_builds() {
 fn example_is_match() {
     let b = regex_is_match!("[ab]+", "car");
     assert_eq!(b, true);
+}
+
+fn example_using_shared_static() {
+    let b = SHARED.is_match("not test");
+    assert_eq!(b, false);
 }
 
 fn example_captures() {
@@ -51,5 +58,9 @@ fn main() {
 
     for _ in 0..10 {
         example_captures();
+    }
+
+    for _ in 0..10 {
+        example_using_shared_static();
     }
 }

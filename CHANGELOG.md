@@ -1,3 +1,7 @@
+<a name="v2.1.0"></a>
+### v2.1.0 - 2021-06-02
+Add the `lazy_regex!` macro returning a `Lazy<Regex>` for easy use in a `pub static` shared declaration.
+
 <a name="v2.0.2"></a>
 ### v2.0.2 - 2021-05-31
 Fix a cross compilation problem, thanks @AlephAlpha - Fix #5

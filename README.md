@@ -22,7 +22,7 @@ Use the  `regex!` macro to build regexes:
 * they can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
 * regex creation is less verbose
 
-This macro builds normal instances of `regex::Regex` so all the usual features are available.
+This macro returns references to normal instances of `regex::Regex` so all the usual features are available.
 
 You may also use shortcut macros for testing a match or capturing groups as substrings:
 
@@ -43,9 +43,6 @@ assert_eq!(r.is_match("Saa"), false);
 let r = regex!("sa+$"i);
 assert_eq!(r.is_match("Saa"), true);
 
-// supported regex flags: 'i', 'm', 's', 'x', 'U'
-// see https://docs.rs/regex/1.5.4/regex/struct.RegexBuilder.html
-
 // you can use a raw literal
 let r = regex!(r#"^"+$"#);
 assert_eq!(r.is_match("\"\""), true);
@@ -54,14 +51,13 @@ assert_eq!(r.is_match("\"\""), true);
 let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
 assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 
-// this line wouldn't compile:
+// this line wouldn't compile because the regex is invalid:
 // let r = regex!("(unclosed");
 
 ```
+Supported regex flags: 'i', 'm', 's', 'x', 'U'.
 
-What you really get from this macro call is a reference to a `regex::Regex`, statically checked, and behind a static `once_cell` lazy initializer.
-
-# Test
+# Test a match
 
 ```rust
 use lazy_regex::regex_is_match;
@@ -70,7 +66,7 @@ let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
 ```
 
-# Extract
+# Extract a value
 
 ```rust
 use lazy_regex::regex_find;
@@ -96,4 +92,23 @@ assert_eq!(name, "lazy_regex");
 assert_eq!(version, "2.0");
 ```
 
-The size of the tuple is checked at compile time and ensures you have the right number of capturing groups.
+There's no limit to the size of the tupple.
+It's checked at compile time to ensure you have the right number of capturing groups.
+
+# Shared lazy static
+
+When a regular expression is used in several functions, you sometimes don't want
+to repeat it but have a shared static instance.
+
+The `regex!` macro, while being backed by a lazy static regex, returns a reference.
+
+If you want to have a shared lazy static regex, use the `lazy_regex!` macro:
+
+```rust
+use lazy_regex::*;
+
+pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
+```
+
+Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
+

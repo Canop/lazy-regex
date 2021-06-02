@@ -17,7 +17,7 @@ You may also use shortcut macros for testing a match or capturing groups as subs
 
 # Build Regexes
 
-```
+```rust
 use lazy_regex::regex;
 
 // build a simple regex
@@ -46,7 +46,7 @@ See [regex::RegexBuilder].
 
 # Test a match
 
-```
+```rust
 use lazy_regex::regex_is_match;
 
 let b = regex_is_match!("[ab]+", "car");
@@ -55,7 +55,7 @@ assert_eq!(b, true);
 
 # Extract a value
 
-```
+```rust
 use lazy_regex::regex_find;
 
 let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
@@ -64,7 +64,7 @@ assert_eq!(f_word, Some("fox"));
 
 # Capture
 
-```
+```rust
 use lazy_regex::regex_captures;
 
 let (_, letter) = regex_captures!("([a-z])[0-9]+"i, "form A42").unwrap();
@@ -82,15 +82,34 @@ assert_eq!(version, "2.0");
 There's no limit to the size of the tupple.
 It's checked at compile time to ensure you have the right number of capturing groups.
 
+# Shared lazy static
+
+When a regular expression is used in several functions, you sometimes don't want
+to repeat it but have a shared static instance.
+
+The [regex!] macro, while being backed by a lazy static regex, returns a reference.
+
+If you want to have a shared lazy static regex, use the [lazy_regex!] macro:
+
+```rust
+use lazy_regex::*;
+
+pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
+```
+
+Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
+
 */
 
 pub use {
-    once_cell,
+    once_cell::sync::Lazy,
     lazy_regex_proc_macros::{
+        lazy_regex,
         regex,
         regex_captures,
         regex_find,
         regex_is_match,
     },
+    regex::Regex,
 };
 
