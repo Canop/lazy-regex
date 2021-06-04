@@ -4,6 +4,7 @@ use {
     quote::quote,
     syn::{
         Expr,
+        ExprClosure,
         LitStr,
         Token,
         parse::{
@@ -62,7 +63,7 @@ impl From<LitStr> for RegexCode {
     }
 }
 
-/// return a lazy static Regex checked at compilation time.
+/// Return a lazy static Regex checked at compilation time.
 ///
 /// Flags can be specified as suffix:
 /// ```
@@ -80,7 +81,7 @@ pub fn regex(input: TokenStream) -> TokenStream {
     q.into()
 }
 
-/// return an instance of `once_cell::sync::Lazy<regex::Regex>` that
+/// Return an instance of `once_cell::sync::Lazy<regex::Regex>` that
 /// you can use in a public static declaration.
 ///
 /// Example:
@@ -99,14 +100,13 @@ pub fn lazy_regex(input: TokenStream) -> TokenStream {
     regex_build.into()
 }
 
-/// wrapping of the two arguments given to one of the
+/// Wrapping of the two arguments given to one of the
 /// `regex_is_match`, `regex_find`, or `regex_captures`
-/// macros.
+/// macros
 struct RegexAndExpr {
     regex_str: LitStr,
     value: Expr,
 }
-
 impl Parse for RegexAndExpr {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let regex_str = input.parse::<LitStr>()?;
@@ -120,7 +120,30 @@ impl Parse for RegexAndExpr {
     }
 }
 
-/// test whether an expression matches a lazy static
+/// Wrapping of the three arguments given to the
+/// `regex_replace_all` macro
+struct RegexAnd2Exprs {
+    regex_str: LitStr,
+    value: Expr,
+    fun: ExprClosure,
+}
+impl Parse for RegexAnd2Exprs {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        let regex_str = input.parse::<LitStr>()?;
+        input.parse::<Token![,]>()?;
+        let value = input.parse::<Expr>()?;
+        input.parse::<Token![,]>()?;
+        let fun = input.parse::<ExprClosure>()?;
+        let _ = input.parse::<Token![,]>(); // allow a trailing comma
+        Ok(RegexAnd2Exprs {
+            regex_str,
+            value,
+            fun,
+        })
+    }
+}
+
+/// Test whether an expression matches a lazy static
 /// regular expression (the regex is checked at compile
 /// time)
 ///
@@ -144,7 +167,7 @@ pub fn regex_is_match(input: TokenStream) -> TokenStream {
     q.into()
 }
 
-/// extract the leftmost match of the regex in the
+/// Extract the leftmost match of the regex in the
 /// second argument, as a &str
 ///
 /// Example:
@@ -166,7 +189,8 @@ pub fn regex_find(input: TokenStream) -> TokenStream {
     q.into()
 }
 
-/// extract captured groups as a tupple of &str
+/// Extract captured groups as a tuple of &str.
+///
 ///
 /// Example:
 /// ```
@@ -195,6 +219,50 @@ pub fn regex_captures(input: TokenStream) -> TokenStream {
             .map(|caps| (
                 #(#groups),*
             ))
+    }};
+    q.into()
+}
+
+/// Replaces all non-overlapping matches in the second argument
+/// with the value returned by the closure given as third argument.
+///
+/// The closure is given one or more `&str`, the first one for
+/// the whole match and the following ones for the groups.
+/// Any optional group with no value is replaced with `""`.
+///
+/// Example:
+/// ```
+/// use lazy_regex::*;
+/// let text = "Foo fuu";
+/// let text = regex_replace_all!(
+///     r#"\bf(?P<suffix>\w+)"#i,
+///     text,
+///     |_, suffix| format!("F<{}>", suffix),
+/// );
+/// assert_eq!(text, "F<oo> F<uu>");
+/// ```
+#[proc_macro]
+pub fn regex_replace_all(input: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(input as RegexAnd2Exprs);
+    let regex_code = RegexCode::from(args.regex_str);
+    let regex_build = regex_code.build;
+    let value = args.value;
+    let fun = args.fun;
+    let n = regex_code.regex.captures_len();
+    let groups = (0..n).map(|i| quote! {
+            caps.get(#i).map_or("", |c| c.as_str())
+        });
+    let q = quote! {{
+        use lazy_regex::Lazy;
+        static RE: Lazy<regex::Regex> = #regex_build;
+        RE.replace_all(
+            #value,
+            |caps: &regex::Captures<'_>| {
+                let fun = #fun;
+                fun(
+                    #(#groups),*
+                )
+            })
     }};
     q.into()
 }

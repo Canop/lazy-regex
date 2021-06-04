@@ -14,6 +14,7 @@ You may also use shortcut macros for testing a match or capturing groups as subs
 * [regex_is_match!]
 * [regex_find!]
 * [regex_captures!]
+* [regex_replace_all!]
 
 # Build Regexes
 
@@ -36,6 +37,15 @@ assert_eq!(r.is_match("\"\""), true);
 let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
 assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 
+// there's no problem using the multiline definition syntax
+let r = regex!(r#"(?x)
+    (?P<name>\w+)
+    -
+    (?P<version>[0-9.]+)
+"#);
+assert_eq!(r.find("This is lazy_regex-2.1!").unwrap().as_str(), "lazy_regex-2.1");
+// look at the regex_captures! macro to easily extract the groups
+
 // this line wouldn't compile because the regex is invalid:
 // let r = regex!("(unclosed");
 
@@ -53,6 +63,9 @@ let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
 ```
 
+doc: [regex_is_match!]
+
+
 # Extract a value
 
 ```rust
@@ -61,6 +74,8 @@ use lazy_regex::regex_find;
 let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
 assert_eq!(f_word, Some("fox"));
 ```
+
+doc: [regex_find!]
 
 # Capture
 
@@ -79,8 +94,28 @@ assert_eq!(name, "lazy_regex");
 assert_eq!(version, "2.0");
 ```
 
-There's no limit to the size of the tupple.
+There's no limit to the size of the tuple.
 It's checked at compile time to ensure you have the right number of capturing groups.
+
+You receive `""` for optional groups with no value.
+
+doc: [regex_captures!]
+
+# Replace with captured groups
+
+```rust
+use lazy_regex::regex_replace_all;
+
+let text = "Foo8 fuu3";
+let text = regex_replace_all!(
+    r#"\bf(\w+)(\d)"#i,
+    text,
+    |_, name, digit| format!("F<{}>{}", name, digit),
+);
+assert_eq!(text, "F<oo>8 F<uu>3");
+```
+
+doc: [regex_replace_all!]
 
 # Shared lazy static
 
@@ -99,6 +134,8 @@ pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
 
 Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
 
+doc: [lazy_regex!]
+
 */
 
 pub use {
@@ -109,6 +146,7 @@ pub use {
         regex_captures,
         regex_find,
         regex_is_match,
+        regex_replace_all,
     },
     regex::Regex,
 };
