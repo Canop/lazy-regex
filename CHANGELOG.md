@@ -1,3 +1,7 @@
+<a name="v2.2.0"></a>
+### v2.2.0 - 2021-06-04
+Add the `regex_replace_all!` macro to do replacements with a closure taking the right number of `&str` arguments according to the number of groups in the regular expression
+
 <a name="v2.1.0"></a>
 ### v2.1.0 - 2021-06-02
 Add the `lazy_regex!` macro returning a `Lazy<Regex>` for easy use in a `pub static` shared declaration.

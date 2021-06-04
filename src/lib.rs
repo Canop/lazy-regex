@@ -9,7 +9,7 @@ Use the  [regex!] macro to build regexes:
 
 This macro returns references to normal instances of [regex::Regex] so all the usual features are available.
 
-You may also use shortcut macros for testing a match or capturing groups as substrings:
+You may also use shortcut macros for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:
 
 * [regex_is_match!]
 * [regex_find!]
@@ -44,7 +44,7 @@ let r = regex!(r#"(?x)
     (?P<version>[0-9.]+)
 "#);
 assert_eq!(r.find("This is lazy_regex-2.1!").unwrap().as_str(), "lazy_regex-2.1");
-// look at the regex_captures! macro to easily extract the groups
+// (look at the regex_captures! macro to easily extract the groups)
 
 // this line wouldn't compile because the regex is invalid:
 // let r = regex!("(unclosed");

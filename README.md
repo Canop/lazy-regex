@@ -24,11 +24,12 @@ Use the  `regex!` macro to build regexes:
 
 This macro returns references to normal instances of `regex::Regex` so all the usual features are available.
 
-You may also use shortcut macros for testing a match or capturing groups as substrings:
+You may also use shortcut macros for testing a match, replacing with concise closures, or capturing groups as substrings:
 
 * `regex_is_match!`
 * `regex_find!`
 * `regex_captures!`
+* `regex_replace_all!`
 
 # Build Regexes
 
@@ -51,6 +52,15 @@ assert_eq!(r.is_match("\"\""), true);
 let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
 assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 
+// there's no problem using the multiline definition syntax
+let r = regex!(r#"(?x)
+    (?P<name>\w+)
+    -
+    (?P<version>[0-9.]+)
+"#);
+assert_eq!(r.find("This is lazy_regex-2.1!").unwrap().as_str(), "lazy_regex-2.1");
+// (look at the regex_captures! macro to easily extract the groups)
+
 // this line wouldn't compile because the regex is invalid:
 // let r = regex!("(unclosed");
 
@@ -65,6 +75,7 @@ use lazy_regex::regex_is_match;
 let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
 ```
+
 
 # Extract a value
 
@@ -92,8 +103,24 @@ assert_eq!(name, "lazy_regex");
 assert_eq!(version, "2.0");
 ```
 
-There's no limit to the size of the tupple.
+There's no limit to the size of the tuple.
 It's checked at compile time to ensure you have the right number of capturing groups.
+
+You receive `""` for optional groups with no value.
+
+# Replace with captured groups
+
+```rust
+use lazy_regex::regex_replace_all;
+
+let text = "Foo8 fuu3";
+let text = regex_replace_all!(
+    r#"\bf(\w+)(\d)"#i,
+    text,
+    |_, name, digit| format!("F<{}>{}", name, digit),
+);
+assert_eq!(text, "F<oo>8 F<uu>3");
+```
 
 # Shared lazy static
 

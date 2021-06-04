@@ -191,6 +191,10 @@ pub fn regex_find(input: TokenStream) -> TokenStream {
 
 /// Extract captured groups as a tuple of &str.
 ///
+/// If there's no match, the macro returns `None`.
+///
+/// If an optional group has no value, the tuple
+/// will contain `""` instead.
 ///
 /// Example:
 /// ```

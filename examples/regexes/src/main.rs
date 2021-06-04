@@ -50,7 +50,7 @@ fn example_captures() {
 fn examples_replace_all() {
     let text = "Foo fuu";
     let text = regex_replace_all!(
-        r#"\bf(?P<suffix>\w+)"#i,
+        r#"\bf\w+)"#i,
         text,
         |_, suffix| format!("F<{}>", suffix),
     );
@@ -89,6 +89,5 @@ fn main() {
         example_using_shared_static();
         examples_replace_all();
     }
-
 
 }
