@@ -148,6 +148,6 @@ pub use {
         regex_is_match,
         regex_replace_all,
     },
-    regex::Regex,
+    regex::{Captures, Regex, RegexBuilder},
 };
 

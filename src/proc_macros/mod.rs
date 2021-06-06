@@ -47,9 +47,9 @@ impl From<LitStr> for RegexCode {
         let regex = regex::Regex::new(&regex_string).unwrap();
 
         let build = quote! {{
-            Lazy::new(|| {
+            lazy_regex::Lazy::new(|| {
                 //println!("compiling regex {:?}", #regex_string);
-                let mut builder = regex::RegexBuilder::new(#regex_string);
+                let mut builder = lazy_regex::RegexBuilder::new(#regex_string);
                 builder.case_insensitive(#case_insensitive);
                 builder.multi_line(#multi_line);
                 builder.dot_matches_new_line(#dot_matches_new_line);
@@ -74,8 +74,7 @@ pub fn regex(input: TokenStream) -> TokenStream {
     let lit_str = syn::parse::<syn::LitStr>(input).unwrap();
     let regex_build = RegexCode::from(lit_str).build;
     let q = quote! {{
-        use lazy_regex::Lazy;
-        static RE: Lazy<regex::Regex> = #regex_build;
+        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
         &RE
     }};
     q.into()
@@ -160,8 +159,7 @@ pub fn regex_is_match(input: TokenStream) -> TokenStream {
     let regex_build = RegexCode::from(regex_and_expr_args.regex_str).build;
     let value = regex_and_expr_args.value;
     let q = quote! {{
-        use lazy_regex::Lazy;
-        static RE: Lazy<regex::Regex> = #regex_build;
+        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
         RE.is_match(#value)
     }};
     q.into()
@@ -182,8 +180,7 @@ pub fn regex_find(input: TokenStream) -> TokenStream {
     let regex_build = regex_code.build;
     let value = regex_and_expr_args.value;
     let q = quote! {{
-        use lazy_regex::Lazy;
-        static RE: Lazy<regex::Regex> = #regex_build;
+        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
         RE.find(#value).map(|mat| mat.as_str())
     }};
     q.into()
@@ -217,8 +214,7 @@ pub fn regex_captures(input: TokenStream) -> TokenStream {
             caps.get(#i).map_or("", |c| c.as_str())
         });
     let q = quote! {{
-        use lazy_regex::Lazy;
-        static RE: Lazy<regex::Regex> = #regex_build;
+        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
         RE.captures(#value)
             .map(|caps| (
                 #(#groups),*
@@ -257,11 +253,10 @@ pub fn regex_replace_all(input: TokenStream) -> TokenStream {
             caps.get(#i).map_or("", |c| c.as_str())
         });
     let q = quote! {{
-        use lazy_regex::Lazy;
-        static RE: Lazy<regex::Regex> = #regex_build;
+        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
         RE.replace_all(
             #value,
-            |caps: &regex::Captures<'_>| {
+            |caps: &lazy_regex::Captures<'_>| {
                 let fun = #fun;
                 fun(
                     #(#groups),*
