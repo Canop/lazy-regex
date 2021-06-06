@@ -1,11 +1,8 @@
-use {
-    lazy_regex::*,
-};
+use lazy_regex::*;
 
 pub static SHARED: Lazy<Regex> = lazy_regex!("^test$");
 
 fn example_builds() {
-
     // build a simple regex
     let r = regex!("sa+$");
     assert_eq!(r.is_match("Saa"), false);
@@ -24,7 +21,6 @@ fn example_builds() {
 
     // this line wouldn't compile:
     // let r = regex!("(unclosed");
-
 }
 
 fn example_is_match() {
@@ -39,9 +35,10 @@ fn example_using_shared_static() {
 
 fn example_captures() {
     let (whole, name, version) = regex_captures!(
-        r#"(\w+)-([0-9.]+)"#, // a literal regex
+        r#"(\w+)-([0-9.]+)"#,      // a literal regex
         "This is lazy_regex-2.0!", // any expression
-    ).unwrap();
+    )
+    .unwrap();
     assert_eq!(whole, "lazy_regex-2.0");
     assert_eq!(name, "lazy_regex");
     assert_eq!(version, "2.0");
@@ -69,14 +66,13 @@ fn examples_replace_all() {
         |_, a: &str, b: &str| {
             let a: u64 = a.parse().unwrap();
             let b: u64 = b.parse().unwrap();
-            (a+b).to_string()
+            (a + b).to_string()
         },
     );
     assert_eq!(text, "A = 8 and B=31");
 }
 
 fn main() {
-
     // the regular expressions will be built only once
     for _ in 0..10 {
         example_builds();
@@ -89,5 +85,4 @@ fn main() {
         example_using_shared_static();
         examples_replace_all();
     }
-
 }

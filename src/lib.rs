@@ -139,15 +139,9 @@ doc: [lazy_regex!]
 */
 
 pub use {
-    once_cell::sync::Lazy,
     lazy_regex_proc_macros::{
-        lazy_regex,
-        regex,
-        regex_captures,
-        regex_find,
-        regex_is_match,
-        regex_replace_all,
+        lazy_regex, regex, regex_captures, regex_find, regex_is_match, regex_replace_all,
     },
+    once_cell::sync::Lazy,
     regex::{Captures, Regex, RegexBuilder},
 };
-

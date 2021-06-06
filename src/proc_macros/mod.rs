@@ -3,16 +3,8 @@ use {
     proc_macro2,
     quote::quote,
     syn::{
-        Expr,
-        ExprClosure,
-        LitStr,
-        Token,
-        parse::{
-            Parse,
-            ParseStream,
-            Result,
-        },
-        parse_macro_input,
+        parse::{Parse, ParseStream, Result},
+        parse_macro_input, Expr, ExprClosure, LitStr, Token,
     },
 };
 
@@ -112,10 +104,7 @@ impl Parse for RegexAndExpr {
         input.parse::<Token![,]>()?;
         let value = input.parse::<Expr>()?;
         let _ = input.parse::<Token![,]>(); // allow a trailing comma
-        Ok(RegexAndExpr {
-            regex_str,
-            value,
-        })
+        Ok(RegexAndExpr { regex_str, value })
     }
 }
 
@@ -210,9 +199,11 @@ pub fn regex_captures(input: TokenStream) -> TokenStream {
     let regex_build = regex_code.build;
     let value = regex_and_expr_args.value;
     let n = regex_code.regex.captures_len();
-    let groups = (0..n).map(|i| quote! {
+    let groups = (0..n).map(|i| {
+        quote! {
             caps.get(#i).map_or("", |c| c.as_str())
-        });
+        }
+    });
     let q = quote! {{
         static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
         RE.captures(#value)
@@ -249,9 +240,11 @@ pub fn regex_replace_all(input: TokenStream) -> TokenStream {
     let value = args.value;
     let fun = args.fun;
     let n = regex_code.regex.captures_len();
-    let groups = (0..n).map(|i| quote! {
+    let groups = (0..n).map(|i| {
+        quote! {
             caps.get(#i).map_or("", |c| c.as_str())
-        });
+        }
+    });
     let q = quote! {{
         static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
         RE.replace_all(
