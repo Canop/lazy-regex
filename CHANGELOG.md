@@ -1,3 +1,8 @@
+<a name="v2.2.1"></a>
+### v2.2.1 - 2021-06-07
+Add the `regex_replace!` macro for when you only want to replace one match
+Reexports more types of the regex crates
+
 <a name="v2.2.0"></a>
 ### v2.2.0 - 2021-06-04
 Add the `regex_replace_all!` macro to do replacements with a closure taking the right number of `&str` arguments according to the number of groups in the regular expression

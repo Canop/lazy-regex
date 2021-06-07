@@ -23,7 +23,7 @@ impl Parse for RexValArgs {
 }
 
 /// Wrapping of the three arguments given to the
-/// `regex_replace_all` macro
+/// ``regex_replace` and regex_replace_all` macros
 pub(crate) struct RexValFunArgs {
     pub regex_str: LitStr,
     pub value: Expr,

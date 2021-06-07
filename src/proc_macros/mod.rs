@@ -11,11 +11,19 @@ use {
     syn::parse_macro_input,
 };
 
-/// Return a lazy static Regex checked at compilation time.
+/// Return a lazy static Regex checked at compilation time and
+/// built at first use.
 ///
 /// Flags can be specified as suffix:
 /// ```
 /// let case_insensitive_regex = regex!("^ab+$"i);
+/// ```
+///
+/// The macro returns a reference to a [regex::Regex] instance:
+/// ```
+/// let verbose = regex!(r#"_([\d\.]+)"#)
+///     .replace("This is lazy-regex_2.2", " (version $1)");
+/// assert_eq!(verbose, "This is lazy-regex (version 2.2)");
 /// ```
 #[proc_macro]
 pub fn regex(input: TokenStream) -> TokenStream {
@@ -34,8 +42,6 @@ pub fn regex(input: TokenStream) -> TokenStream {
 /// Example:
 ///
 /// ```
-/// use lazy_regex::*;
-///
 /// pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
 /// ```
 ///
@@ -53,8 +59,6 @@ pub fn lazy_regex(input: TokenStream) -> TokenStream {
 ///
 /// Example:
 /// ```
-/// use lazy_regex::regex_is_match;
-///
 /// let b = regex_is_match!("[ab]+", "car");
 /// assert_eq!(b, true);
 /// ```
@@ -130,26 +134,8 @@ pub fn regex_captures(input: TokenStream) -> TokenStream {
     q.into()
 }
 
-/// Replaces all non-overlapping matches in the second argument
-/// with the value returned by the closure given as third argument.
-///
-/// The closure is given one or more `&str`, the first one for
-/// the whole match and the following ones for the groups.
-/// Any optional group with no value is replaced with `""`.
-///
-/// Example:
-/// ```
-/// use lazy_regex::*;
-/// let text = "Foo fuu";
-/// let text = regex_replace_all!(
-///     r#"\bf(?P<suffix>\w+)"#i,
-///     text,
-///     |_, suffix| format!("F<{}>", suffix),
-/// );
-/// assert_eq!(text, "F<oo> F<uu>");
-/// ```
-#[proc_macro]
-pub fn regex_replace_all(input: TokenStream) -> TokenStream {
+/// common implementation of regex_replace and regex_replace_all
+fn replacen(input: TokenStream, limit: usize) -> TokenStream {
     let args = parse_macro_input!(input as RexValFunArgs);
     let regex_code = RegexCode::from(args.regex_str);
     let regex_build = regex_code.build;
@@ -163,8 +149,9 @@ pub fn regex_replace_all(input: TokenStream) -> TokenStream {
     });
     let q = quote! {{
         static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
-        RE.replace_all(
+        RE.replacen(
             #value,
+            #limit,
             |caps: &lazy_regex::Captures<'_>| {
                 let fun = #fun;
                 fun(
@@ -173,4 +160,48 @@ pub fn regex_replace_all(input: TokenStream) -> TokenStream {
             })
     }};
     q.into()
+}
+
+/// Replaces the leftmost match in the second argument
+/// with the value returned by the closure given as third argument.
+///
+/// The closure is given one or more `&str`, the first one for
+/// the whole match and the following ones for the groups.
+/// Any optional group with no value is replaced with `""`.
+///
+/// Example:
+/// ```
+/// let text = "Fuu fuuu";
+/// let text = regex_replace!(
+///     "f(u*)"i,
+///     text,
+///     |_, suffix: &str| format!("F{}", suffix.len()),
+/// );
+/// assert_eq!(text, "F2 fuuu");
+/// ```
+#[proc_macro]
+pub fn regex_replace(input: TokenStream) -> TokenStream {
+    replacen(input, 1)
+}
+
+/// Replaces all non-overlapping matches in the second argument
+/// with the value returned by the closure given as third argument.
+///
+/// The closure is given one or more `&str`, the first one for
+/// the whole match and the following ones for the groups.
+/// Any optional group with no value is replaced with `""`.
+///
+/// Example:
+/// ```
+/// let text = "Foo fuu";
+/// let text = regex_replace_all!(
+///     r#"\bf(?P<suffix>\w+)"#i,
+///     text,
+///     |_, suffix| format!("F<{}>", suffix),
+/// );
+/// assert_eq!(text, "F<oo> F<uu>");
+/// ```
+#[proc_macro]
+pub fn regex_replace_all(input: TokenStream) -> TokenStream {
+    replacen(input, 0)
 }

@@ -24,12 +24,15 @@ Use the  `regex!` macro to build regexes:
 
 This macro returns references to normal instances of `regex::Regex` so all the usual features are available.
 
-You may also use shortcut macros for testing a match, replacing with concise closures, or capturing groups as substrings:
+You may also use shortcut macros for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:
 
 * `regex_is_match!`
 * `regex_find!`
 * `regex_captures!`
+* `regex_replace!`
 * `regex_replace_all!`
+
+Some structs of the regex crate are reexported to ease dependency managment.
 
 # Build Regexes
 
@@ -58,7 +61,7 @@ let r = regex!(r#"(?x)
     -
     (?P<version>[0-9.]+)
 "#);
-assert_eq!(r.find("This is lazy_regex-2.1!").unwrap().as_str(), "lazy_regex-2.1");
+assert_eq!(r.find("This is lazy_regex-2.2!").unwrap().as_str(), "lazy_regex-2.2");
 // (look at the regex_captures! macro to easily extract the groups)
 
 // this line wouldn't compile because the regex is invalid:
@@ -66,6 +69,8 @@ assert_eq!(r.find("This is lazy_regex-2.1!").unwrap().as_str(), "lazy_regex-2.1"
 
 ```
 Supported regex flags: 'i', 'm', 's', 'x', 'U'.
+
+See `regex::RegexBuilder`.
 
 # Test a match
 
@@ -76,6 +81,8 @@ let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
 ```
 
+doc: `regex_is_match!`
+
 
 # Extract a value
 
@@ -85,6 +92,8 @@ use lazy_regex::regex_find;
 let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
 assert_eq!(f_word, Some("fox"));
 ```
+
+doc: `regex_find!`
 
 # Capture
 
@@ -108,6 +117,8 @@ It's checked at compile time to ensure you have the right number of capturing gr
 
 You receive `""` for optional groups with no value.
 
+doc: `regex_captures!`
+
 # Replace with captured groups
 
 ```rust
@@ -121,6 +132,9 @@ let text = regex_replace_all!(
 );
 assert_eq!(text, "F<oo>8 F<uu>3");
 ```
+The number of arguments given to the closure is checked at compilation time to match the number of groups in the regular expression.
+
+doc: `regex_replace!` and `regex_replace_all!`
 
 # Shared lazy static
 
@@ -139,3 +153,19 @@ pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
 
 Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
 
+doc: `lazy_regex!`
+
+*/
+
+pub use {
+    lazy_regex_proc_macros::{
+        lazy_regex, regex,
+        regex_captures,
+        regex_find,
+        regex_is_match,
+        regex_replace,
+        regex_replace_all,
+    },
+    once_cell::sync::Lazy,
+    regex::{Captures, Regex, RegexBuilder},
+};

@@ -14,7 +14,10 @@ You may also use shortcut macros for testing a match, replacing with concise clo
 * [regex_is_match!]
 * [regex_find!]
 * [regex_captures!]
+* [regex_replace!]
 * [regex_replace_all!]
+
+Some structs of the regex crate are reexported to ease dependency managment.
 
 # Build Regexes
 
@@ -43,14 +46,14 @@ let r = regex!(r#"(?x)
     -
     (?P<version>[0-9.]+)
 "#);
-assert_eq!(r.find("This is lazy_regex-2.1!").unwrap().as_str(), "lazy_regex-2.1");
+assert_eq!(r.find("This is lazy_regex-2.2!").unwrap().as_str(), "lazy_regex-2.2");
 // (look at the regex_captures! macro to easily extract the groups)
 
 // this line wouldn't compile because the regex is invalid:
 // let r = regex!("(unclosed");
 
 ```
-Supported regex flags: 'i', 'm', 's', 'x', 'U'.
+Supported regex flags: `i`, `m`, `s`, `x`, `U`.
 
 See [regex::RegexBuilder].
 
@@ -114,8 +117,9 @@ let text = regex_replace_all!(
 );
 assert_eq!(text, "F<oo>8 F<uu>3");
 ```
+The number of arguments given to the closure is checked at compilation time to match the number of groups in the regular expression.
 
-doc: [regex_replace_all!]
+doc: [regex_replace!] and [regex_replace_all!]
 
 # Shared lazy static
 
@@ -140,7 +144,12 @@ doc: [lazy_regex!]
 
 pub use {
     lazy_regex_proc_macros::{
-        lazy_regex, regex, regex_captures, regex_find, regex_is_match, regex_replace_all,
+        lazy_regex, regex,
+        regex_captures,
+        regex_find,
+        regex_is_match,
+        regex_replace,
+        regex_replace_all,
     },
     once_cell::sync::Lazy,
     regex::{Captures, Regex, RegexBuilder},
