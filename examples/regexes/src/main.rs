@@ -47,7 +47,7 @@ fn example_captures() {
 fn examples_replace_all() {
     let text = "Foo fuu";
     let text = regex_replace_all!(
-        r#"\bf\w+)"#i,
+        r#"\bf(\w+)"#i,
         text,
         |_, suffix| format!("F<{}>", suffix),
     );

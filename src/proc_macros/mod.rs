@@ -1,59 +1,15 @@
+mod args;
+mod regex_code;
+
 use {
-    proc_macro::TokenStream,
-    proc_macro2,
-    quote::quote,
-    syn::{
-        parse::{Parse, ParseStream, Result},
-        parse_macro_input, Expr, ExprClosure, LitStr, Token,
+    crate::{
+        args::*,
+        regex_code::*,
     },
+    proc_macro::TokenStream,
+    quote::quote,
+    syn::parse_macro_input,
 };
-
-struct RegexCode {
-    regex: regex::Regex,
-    build: proc_macro2::TokenStream,
-}
-
-impl From<LitStr> for RegexCode {
-    fn from(lit_str: LitStr) -> Self {
-        let regex_string = lit_str.value();
-        let mut case_insensitive = false;
-        let mut multi_line = false;
-        let mut dot_matches_new_line = false;
-        let mut ignore_whitespace = false;
-        let mut swap_greed = false;
-        for ch in lit_str.suffix().chars() {
-            match ch {
-                'i' => case_insensitive = true,
-                'm' => multi_line = true,
-                's' => dot_matches_new_line = true,
-                'x' => ignore_whitespace = true,
-                'U' => swap_greed = true,
-                _ => {
-                    panic!("unrecognized regex flag {:?}", ch);
-                }
-            };
-        }
-
-        // the next line prevents compilation if the
-        // literal is invalid as a regular expression
-        let regex = regex::Regex::new(&regex_string).unwrap();
-
-        let build = quote! {{
-            lazy_regex::Lazy::new(|| {
-                //println!("compiling regex {:?}", #regex_string);
-                let mut builder = lazy_regex::RegexBuilder::new(#regex_string);
-                builder.case_insensitive(#case_insensitive);
-                builder.multi_line(#multi_line);
-                builder.dot_matches_new_line(#dot_matches_new_line);
-                builder.ignore_whitespace(#ignore_whitespace);
-                builder.swap_greed(#swap_greed);
-                builder.build().unwrap()
-            })
-        }};
-
-        Self { regex, build }
-    }
-}
 
 /// Return a lazy static Regex checked at compilation time.
 ///
@@ -91,46 +47,6 @@ pub fn lazy_regex(input: TokenStream) -> TokenStream {
     regex_build.into()
 }
 
-/// Wrapping of the two arguments given to one of the
-/// `regex_is_match`, `regex_find`, or `regex_captures`
-/// macros
-struct RegexAndExpr {
-    regex_str: LitStr,
-    value: Expr,
-}
-impl Parse for RegexAndExpr {
-    fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let regex_str = input.parse::<LitStr>()?;
-        input.parse::<Token![,]>()?;
-        let value = input.parse::<Expr>()?;
-        let _ = input.parse::<Token![,]>(); // allow a trailing comma
-        Ok(RegexAndExpr { regex_str, value })
-    }
-}
-
-/// Wrapping of the three arguments given to the
-/// `regex_replace_all` macro
-struct RegexAnd2Exprs {
-    regex_str: LitStr,
-    value: Expr,
-    fun: ExprClosure,
-}
-impl Parse for RegexAnd2Exprs {
-    fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let regex_str = input.parse::<LitStr>()?;
-        input.parse::<Token![,]>()?;
-        let value = input.parse::<Expr>()?;
-        input.parse::<Token![,]>()?;
-        let fun = input.parse::<ExprClosure>()?;
-        let _ = input.parse::<Token![,]>(); // allow a trailing comma
-        Ok(RegexAnd2Exprs {
-            regex_str,
-            value,
-            fun,
-        })
-    }
-}
-
 /// Test whether an expression matches a lazy static
 /// regular expression (the regex is checked at compile
 /// time)
@@ -144,7 +60,7 @@ impl Parse for RegexAnd2Exprs {
 /// ```
 #[proc_macro]
 pub fn regex_is_match(input: TokenStream) -> TokenStream {
-    let regex_and_expr_args = parse_macro_input!(input as RegexAndExpr);
+    let regex_and_expr_args = parse_macro_input!(input as RexValArgs);
     let regex_build = RegexCode::from(regex_and_expr_args.regex_str).build;
     let value = regex_and_expr_args.value;
     let q = quote! {{
@@ -164,7 +80,7 @@ pub fn regex_is_match(input: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro]
 pub fn regex_find(input: TokenStream) -> TokenStream {
-    let regex_and_expr_args = parse_macro_input!(input as RegexAndExpr);
+    let regex_and_expr_args = parse_macro_input!(input as RexValArgs);
     let regex_code = RegexCode::from(regex_and_expr_args.regex_str);
     let regex_build = regex_code.build;
     let value = regex_and_expr_args.value;
@@ -194,7 +110,7 @@ pub fn regex_find(input: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro]
 pub fn regex_captures(input: TokenStream) -> TokenStream {
-    let regex_and_expr_args = parse_macro_input!(input as RegexAndExpr);
+    let regex_and_expr_args = parse_macro_input!(input as RexValArgs);
     let regex_code = RegexCode::from(regex_and_expr_args.regex_str);
     let regex_build = regex_code.build;
     let value = regex_and_expr_args.value;
@@ -234,7 +150,7 @@ pub fn regex_captures(input: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro]
 pub fn regex_replace_all(input: TokenStream) -> TokenStream {
-    let args = parse_macro_input!(input as RegexAnd2Exprs);
+    let args = parse_macro_input!(input as RexValFunArgs);
     let regex_code = RegexCode::from(args.regex_str);
     let regex_build = regex_code.build;
     let value = args.value;
