@@ -81,6 +81,8 @@ let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
 ```
 
+As for other macros, the main benefits here are that the regular expression is checked at compile time and compiled only once (lazily) in the life of your program.
+
 # Extract a value
 
 ```rust
