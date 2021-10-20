@@ -1,3 +1,7 @@
+<a name="v2.2.2"></a>
+### v2.2.2 - 2021-10-20
+Reexpose features of the regex crate
+
 <a name="v2.2.1"></a>
 ### v2.2.1 - 2021-06-07
 Add the `regex_replace!` macro for when you only want to replace one match

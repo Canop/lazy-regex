@@ -16,7 +16,7 @@ regex = {version = "1.5", default_features = false}
 
 [dependencies.lazy-regex-proc_macros]
 path = "src/proc_macros"
-version = "2.2.1"
+version = "2.2.2"
 
 [features]
 default = ["regex/default"]
