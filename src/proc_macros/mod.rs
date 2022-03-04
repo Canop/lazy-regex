@@ -8,8 +8,28 @@ use {
     },
     proc_macro::TokenStream,
     quote::quote,
-    syn::parse_macro_input,
+    syn::{Expr, ExprClosure, parse_macro_input},
 };
+
+//  The following `process*` functions are convenience funcs
+//  to reduce boilerplate in macro implementations below.
+fn process<T, F>(input: TokenStream, f: F) -> TokenStream
+where T: Into<TokenStream>, F: Fn(RegexCode) -> T {
+    f(RegexCode::from(input)).into()
+}
+
+fn process_with_value<T, F>(input: TokenStream, f: F) -> TokenStream
+where T: Into<TokenStream>, F: Fn(RegexCode, Expr) -> T {
+    let parsed = parse_macro_input!(input as RexValArgs);
+    f(RegexCode::from(parsed.regex_str), parsed.value).into()
+}
+
+fn process_with_value_fun<T, F>(input: TokenStream, f: F) -> TokenStream
+where T: Into<TokenStream>,
+      F: Fn(RegexCode, Expr, ExprClosure) -> T {
+    let parsed = parse_macro_input!(input as RexValFunArgs);
+    f(RegexCode::from(parsed.regex_str), parsed.value, parsed.fun).into()
+}
 
 /// Return a lazy static Regex checked at compilation time and
 /// built at first use.
@@ -19,7 +39,9 @@ use {
 /// let case_insensitive_regex = regex!("^ab+$"i);
 /// ```
 ///
-/// The macro returns a reference to a [regex::Regex] instance:
+/// The macro returns a reference to a [regex::Regex]
+/// or a [regex::bytes::Regex] instance,
+/// differentiated by the `B` flag:
 /// ```
 /// let verbose = regex!(r#"_([\d\.]+)"#)
 ///     .replace("This is lazy-regex_2.2", " (version $1)");
@@ -27,16 +49,11 @@ use {
 /// ```
 #[proc_macro]
 pub fn regex(input: TokenStream) -> TokenStream {
-    let lit_str = syn::parse::<syn::LitStr>(input).unwrap();
-    let regex_build = RegexCode::from(lit_str).build;
-    let q = quote! {{
-        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
-        &RE
-    }};
-    q.into()
+    process(input, |regex_code| regex_code.lazy_static())
 }
 
-/// Return an instance of `once_cell::sync::Lazy<regex::Regex>` that
+/// Return an instance of `once_cell::sync::Lazy<regex::Regex>` or
+/// `once_cell::sync::Lazy<regex::bytes::Regex>` that
 /// you can use in a public static declaration.
 ///
 /// Example:
@@ -48,9 +65,7 @@ pub fn regex(input: TokenStream) -> TokenStream {
 /// As for other macros, the regex is checked at compilation time.
 #[proc_macro]
 pub fn lazy_regex(input: TokenStream) -> TokenStream {
-    let lit_str = syn::parse::<syn::LitStr>(input).unwrap();
-    let regex_build = RegexCode::from(lit_str).build;
-    regex_build.into()
+    process(input, |regex_code| regex_code.build)
 }
 
 /// Test whether an expression matches a lazy static
@@ -64,35 +79,39 @@ pub fn lazy_regex(input: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro]
 pub fn regex_is_match(input: TokenStream) -> TokenStream {
-    let regex_and_expr_args = parse_macro_input!(input as RexValArgs);
-    let regex_build = RegexCode::from(regex_and_expr_args.regex_str).build;
-    let value = regex_and_expr_args.value;
-    let q = quote! {{
-        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
-        RE.is_match(#value)
-    }};
-    q.into()
+    process_with_value(input, |regex_code, value| {
+        let statick = regex_code.statick();
+        quote! {{
+            #statick;
+            RE.is_match(#value)
+        }}
+    })
 }
 
 /// Extract the leftmost match of the regex in the
-/// second argument, as a &str
+/// second argument, as a `&str`, or a `&[u8]` if the `B` flag is set.
 ///
 /// Example:
 /// ```
 /// let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
 /// assert_eq!(f_word, Some("fox"));
+/// let f_word = regex_find!(r#"\bf\w+\b"#B, "The forest is silent.");
+/// assert_eq!(f_word, Some(b"forest" as &[u8]));
 /// ```
 #[proc_macro]
 pub fn regex_find(input: TokenStream) -> TokenStream {
-    let regex_and_expr_args = parse_macro_input!(input as RexValArgs);
-    let regex_code = RegexCode::from(regex_and_expr_args.regex_str);
-    let regex_build = regex_code.build;
-    let value = regex_and_expr_args.value;
-    let q = quote! {{
-        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
-        RE.find(#value).map(|mat| mat.as_str())
-    }};
-    q.into()
+    process_with_value(input, |regex_code, value| {
+        let statick = regex_code.statick();
+        let as_method = if regex_code.is_bytes {
+            quote! { as_bytes }
+        } else {
+            quote! { as_str }
+        };
+        quote! {{
+            #statick;
+            RE.find(#value).map(|mat| mat. #as_method ())
+        }}
+    })
 }
 
 /// Extract captured groups as a tuple of &str.
@@ -114,52 +133,47 @@ pub fn regex_find(input: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro]
 pub fn regex_captures(input: TokenStream) -> TokenStream {
-    let regex_and_expr_args = parse_macro_input!(input as RexValArgs);
-    let regex_code = RegexCode::from(regex_and_expr_args.regex_str);
-    let regex_build = regex_code.build;
-    let value = regex_and_expr_args.value;
-    let n = regex_code.regex.captures_len();
-    let groups = (0..n).map(|i| {
-        quote! {
-            caps.get(#i).map_or("", |c| c.as_str())
-        }
-    });
-    let q = quote! {{
-        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
-        RE.captures(#value)
-            .map(|caps| (
-                #(#groups),*
-            ))
-    }};
-    q.into()
+    process_with_value(input, |regex_code, value| {
+        let statick = regex_code.statick();
+        let n = regex_code.captures_len();
+        let groups = (0..n).map(|i| {
+            quote! {
+                caps.get(#i).map_or("", |c| c.as_str())
+            }
+        });
+        quote! {{
+            #statick;
+            RE.captures(#value)
+                .map(|caps| (
+                    #(#groups),*
+                ))
+        }}
+    })
 }
 
 /// common implementation of regex_replace and regex_replace_all
 fn replacen(input: TokenStream, limit: usize) -> TokenStream {
-    let args = parse_macro_input!(input as RexValFunArgs);
-    let regex_code = RegexCode::from(args.regex_str);
-    let regex_build = regex_code.build;
-    let value = args.value;
-    let fun = args.fun;
-    let n = regex_code.regex.captures_len();
-    let groups = (0..n).map(|i| {
-        quote! {
-            caps.get(#i).map_or("", |c| c.as_str())
-        }
-    });
-    let q = quote! {{
-        static RE: lazy_regex::Lazy<lazy_regex::Regex> = #regex_build;
-        RE.replacen(
-            #value,
-            #limit,
-            |caps: &lazy_regex::Captures<'_>| {
-                let fun = #fun;
-                fun(
-                    #(#groups),*
-                )
-            })
-    }};
-    q.into()
+    process_with_value_fun(input, |regex_code, value, fun| {
+        let statick = regex_code.statick();
+        let n = regex_code.captures_len();
+        let groups = (0..n).map(|i| {
+            quote! {
+                caps.get(#i).map_or("", |c| c.as_str())
+            }
+        });
+        quote! {{
+            #statick;
+            RE.replacen(
+                #value,
+                #limit,
+                |caps: &lazy_regex::Captures<'_>| {
+                    let fun = #fun;
+                    fun(
+                        #(#groups),*
+                    )
+                })
+        }}
+    })
 }
 
 /// Replaces the leftmost match in the second argument
@@ -205,3 +219,4 @@ pub fn regex_replace(input: TokenStream) -> TokenStream {
 pub fn regex_replace_all(input: TokenStream) -> TokenStream {
     replacen(input, 0)
 }
+

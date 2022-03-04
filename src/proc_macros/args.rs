@@ -1,8 +1,6 @@
-use {
-    syn::{
-        parse::{Parse, ParseStream, Result},
-        Expr, ExprClosure, LitStr, Token,
-    },
+use syn::{
+    parse::{Parse, ParseStream, Result},
+    Expr, ExprClosure, LitStr, Token,
 };
 
 /// Wrapping of the two arguments given to one of the
@@ -12,6 +10,7 @@ pub(crate) struct RexValArgs {
     pub regex_str: LitStr,
     pub value: Expr, // this expression is (or produces) the text to search or check
 }
+
 impl Parse for RexValArgs {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let regex_str = input.parse::<LitStr>()?;

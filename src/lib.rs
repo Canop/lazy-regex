@@ -7,7 +7,10 @@ Use the  [regex!] macro to build regexes:
 * they can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
 * regex creation is less verbose
 
-This macro returns references to normal instances of [regex::Regex] so all the usual features are available.
+This macro returns references to normal instances of [regex::Regex] or [regex::bytes::Regex] so all the usual features are available.
+
+A special, non-standard flag, `B`, is used to indicate a `regex::bytes::Regex` variant,
+which operates on bytes (`&[u8]`) instead of `&str`s.
 
 You may also use shortcut macros for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:
 
@@ -16,6 +19,8 @@ You may also use shortcut macros for testing a match, replacing with concise clo
 * [regex_captures!]
 * [regex_replace!]
 * [regex_replace_all!]
+
+All of them support the `B` flag for the `regex::bytes::Regex` variant.
 
 Some structs of the regex crate are reexported to ease dependency managment.
 
@@ -39,6 +44,10 @@ assert_eq!(r.is_match("\"\""), true);
 // or a raw literal with flag(s)
 let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
 assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
+
+// build a regex that operates on &[u8]
+let r = regex!("(byte)?string$"B);
+assert_eq!(r.is_match(b"bytestring"), true);
 
 // there's no problem using the multiline definition syntax
 let r = regex!(r#"(?x)
@@ -76,6 +85,8 @@ use lazy_regex::regex_find;
 
 let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
 assert_eq!(f_word, Some("fox"));
+let f_word = regex_find!(r#"\bf\w+\b"#B, b"The forest is silent.");
+assert_eq!(f_word, Some(b"forest" as &[u8]));
 ```
 
 doc: [regex_find!]
@@ -150,7 +161,21 @@ pub use {
         regex_is_match,
         regex_replace,
         regex_replace_all,
+        /*/ bytes variants
+        lazy_regex_bytes, regex_bytes,
+        regex_captures_bytes,
+        regex_find_bytes,
+        regex_is_match_bytes,
+        regex_replace_bytes,
+        regex_replace_all_bytes,
+        */
     },
     once_cell::sync::Lazy,
-    regex::{Captures, Regex, RegexBuilder},
+    regex::{
+        Captures, Regex, RegexBuilder,
+        bytes::{
+            Regex as BytesRegex,
+            RegexBuilder as BytesRegexBuilder
+        },
+    },
 };
