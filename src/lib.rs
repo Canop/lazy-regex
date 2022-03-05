@@ -161,14 +161,6 @@ pub use {
         regex_is_match,
         regex_replace,
         regex_replace_all,
-        /*/ bytes variants
-        lazy_regex_bytes, regex_bytes,
-        regex_captures_bytes,
-        regex_find_bytes,
-        regex_is_match_bytes,
-        regex_replace_bytes,
-        regex_replace_all_bytes,
-        */
     },
     once_cell::sync::Lazy,
     regex::{

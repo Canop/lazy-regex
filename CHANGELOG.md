@@ -1,3 +1,6 @@
+### next
+- support for [bytes](https://docs.rs/regex/latest/regex/bytes/index.html) regexes with the `B` suffix notatation - thanks @bnoctis - Fix #11
+
 <a name="v2.2.2"></a>
 ### v2.2.2 - 2021-10-20
 Reexpose features of the regex crate

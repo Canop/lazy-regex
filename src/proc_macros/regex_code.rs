@@ -5,10 +5,15 @@ use {
     proc_macro2::TokenStream as TokenStream2,
 };
 
-fn quote_build(pattern: &str, is_bytes: bool,
-        case_insensitive: bool, multi_line: bool,
-        dot_matches_new_line: bool, ignore_whitespace: bool,
-        swap_greed: bool) -> TokenStream2 {
+fn quote_build(
+    pattern: &str,
+    is_bytes: bool,
+    case_insensitive: bool,
+    multi_line: bool,
+    dot_matches_new_line: bool,
+    ignore_whitespace: bool,
+    swap_greed: bool,
+) -> TokenStream2 {
     let builder_token = if is_bytes {
         quote! { BytesRegexBuilder }
     } else {
@@ -73,9 +78,15 @@ impl From<LitStr> for RegexCode {
             None
         };
 
-        let build = quote_build(&pattern, is_bytes,
-            case_insensitive, multi_line, dot_matches_new_line,
-            ignore_whitespace, swap_greed);
+        let build = quote_build(
+            &pattern,
+            is_bytes,
+            case_insensitive,
+            multi_line,
+            dot_matches_new_line,
+            ignore_whitespace,
+            swap_greed,
+        );
         Self {
             build,
             is_bytes,
