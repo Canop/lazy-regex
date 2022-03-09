@@ -1,6 +1,6 @@
 <a name="v2.3.0"></a>
 ### v2.3.0 - 2022-03-05
-- support for [bytes](https://docs.rs/regex/latest/regex/bytes/index.html) regexes with the `B` suffix notatation - thanks @bnoctis - Fix #11
+- support for [bytes](https://docs.rs/regex/latest/regex/bytes/index.html) regexes with the `B` suffix notation - thanks @bnoctis - Fix #11
 
 <a name="v2.2.2"></a>
 ### v2.2.2 - 2021-10-20
