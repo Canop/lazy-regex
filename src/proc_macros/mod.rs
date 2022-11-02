@@ -1,34 +1,50 @@
+use std::convert::TryFrom;
+
 mod args;
 mod regex_code;
 
 use {
-    crate::{
-        args::*,
-        regex_code::*,
-    },
+    crate::{args::*, regex_code::*},
     proc_macro::TokenStream,
     quote::quote,
-    syn::{Expr, ExprClosure, parse_macro_input},
+    syn::{parse_macro_input, Expr, ExprClosure},
 };
 
 //  The following `process*` functions are convenience funcs
 //  to reduce boilerplate in macro implementations below.
 fn process<T, F>(input: TokenStream, f: F) -> TokenStream
-where T: Into<TokenStream>, F: Fn(RegexCode) -> T {
-    f(RegexCode::from(input)).into()
+where
+    T: Into<TokenStream>,
+    F: Fn(RegexCode) -> T,
+{
+    match RegexCode::try_from(input) {
+        Ok(r) => f(r).into(),
+        Err(e) => e.to_compile_error().into(),
+    }
 }
 
 fn process_with_value<T, F>(input: TokenStream, f: F) -> TokenStream
-where T: Into<TokenStream>, F: Fn(RegexCode, Expr) -> T {
+where
+    T: Into<TokenStream>,
+    F: Fn(RegexCode, Expr) -> T,
+{
     let parsed = parse_macro_input!(input as RexValArgs);
-    f(RegexCode::from(parsed.regex_str), parsed.value).into()
+    match RegexCode::try_from(parsed.regex_str) {
+        Ok(r) => f(r, parsed.value).into(),
+        Err(e) => e.to_compile_error().into(),
+    }
 }
 
 fn process_with_value_fun<T, F>(input: TokenStream, f: F) -> TokenStream
-where T: Into<TokenStream>,
-      F: Fn(RegexCode, Expr, ExprClosure) -> T {
+where
+    T: Into<TokenStream>,
+    F: Fn(RegexCode, Expr, ExprClosure) -> T,
+{
     let parsed = parse_macro_input!(input as RexValFunArgs);
-    f(RegexCode::from(parsed.regex_str), parsed.value, parsed.fun).into()
+    match RegexCode::try_from(parsed.regex_str) {
+        Ok(r) => f(r, parsed.value, parsed.fun).into(),
+        Err(e) => e.to_compile_error().into(),
+    }
 }
 
 /// Return a lazy static Regex checked at compilation time and
@@ -102,10 +118,9 @@ pub fn regex_is_match(input: TokenStream) -> TokenStream {
 pub fn regex_find(input: TokenStream) -> TokenStream {
     process_with_value(input, |regex_code, value| {
         let statick = regex_code.statick();
-        let as_method = if regex_code.is_bytes {
-            quote! { as_bytes }
-        } else {
-            quote! { as_str }
+        let as_method = match regex_code.regex {
+            RegexInstance::Regex(..) => quote!(as_str),
+            RegexInstance::Bytes(..) => quote!(as_bytes),
         };
         quote! {{
             #statick;
@@ -219,4 +234,3 @@ pub fn regex_replace(input: TokenStream) -> TokenStream {
 pub fn regex_replace_all(input: TokenStream) -> TokenStream {
     replacen(input, 0)
 }
-
