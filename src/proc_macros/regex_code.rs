@@ -1,7 +1,9 @@
-use std::convert::TryFrom;
-
 use {
-    proc_macro::TokenStream, proc_macro2::TokenStream as TokenStream2, quote::quote, syn::LitStr,
+    proc_macro::TokenStream,
+    proc_macro2::TokenStream as TokenStream2,
+    quote::quote,
+    std::convert::TryFrom,
+    syn::LitStr,
 };
 
 /// The lazy static regex building code, which is produced and
@@ -42,9 +44,9 @@ impl TryFrom<LitStr> for RegexCode {
         }
 
         let regex = if is_bytes {
-            regex::bytes::Regex::new(&pattern).map(|r| RegexInstance::Bytes(r))
+            regex::bytes::Regex::new(&pattern).map(RegexInstance::Bytes)
         } else {
-            regex::Regex::new(&pattern).map(|r| RegexInstance::Regex(r))
+            regex::Regex::new(&pattern).map(RegexInstance::Regex)
         };
         let regex = regex.map_err(|e| syn::Error::new(lit_str.span(), e.to_string()))?;
 

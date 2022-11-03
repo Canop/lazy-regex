@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex"
-version = "2.3.0"
+version = "2.3.1-dev"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2021"
 description = "lazy static regular expressions checked at compile time"

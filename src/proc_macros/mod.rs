@@ -1,5 +1,3 @@
-use std::convert::TryFrom;
-
 mod args;
 mod regex_code;
 
@@ -7,6 +5,7 @@ use {
     crate::{args::*, regex_code::*},
     proc_macro::TokenStream,
     quote::quote,
+    std::convert::TryFrom,
     syn::{parse_macro_input, Expr, ExprClosure},
 };
 

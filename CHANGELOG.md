@@ -1,3 +1,7 @@
+<a name="v2.3.1"></a>
+### v2.3.1 - 2022-11-03
+- better error messages on bad regexes - thanks @necauqua
+
 <a name="v2.3.0"></a>
 ### v2.3.0 - 2022-03-05
 - support for [bytes](https://docs.rs/regex/latest/regex/bytes/index.html) regexes with the `B` suffix notation - thanks @bnoctis - Fix #11
