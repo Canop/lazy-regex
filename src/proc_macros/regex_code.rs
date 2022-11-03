@@ -27,7 +27,7 @@ impl TryFrom<LitStr> for RegexCode {
         let mut ignore_whitespace = false;
         let mut swap_greed = false;
         let mut is_bytes = false;
-        for ch in lit_str.suffix().chars() {
+        for (i, ch) in lit_str.suffix().chars().enumerate() {
             match ch {
                 'i' => case_insensitive = true,
                 'm' => multi_line = true,
@@ -36,7 +36,13 @@ impl TryFrom<LitStr> for RegexCode {
                 'U' => swap_greed = true,
                 'B' => is_bytes = true, // non-standard!
                 _ => {
-                    panic!("unrecognized regex flag {:?}", ch);
+                    let lit = lit_str.token();
+                    let pos = lit.to_string().len() - i;
+                    // subspan only works on nighlty
+                    return Err(syn::Error::new(
+                        lit.subspan(pos - 1..pos).unwrap_or_else(|| lit.span()),
+                        format!("unrecognized regex flag {:?}", ch),
+                    ));
                 }
             };
         }
