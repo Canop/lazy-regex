@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex"
-version = "2.3.2-dev"
+version = "2.3.2"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2021"
 description = "lazy static regular expressions checked at compile time"
@@ -17,7 +17,7 @@ regex = {version = "1.7", default_features = false, features = ["std"]}
 
 [dependencies.lazy-regex-proc_macros]
 path = "src/proc_macros"
-version = "2.3.1"
+version = "2.3.2"
 
 [features]
 default = ["regex/default"]
