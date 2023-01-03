@@ -58,8 +58,10 @@ let r = regex!(r#"(?x)
 assert_eq!(r.find("This is lazy_regex-2.2!").unwrap().as_str(), "lazy_regex-2.2");
 // (look at the regex_captures! macro to easily extract the groups)
 
-// this line wouldn't compile because the regex is invalid:
-// let r = regex!("(unclosed");
+```
+```compile_fail
+// this line doesn't compile because the regex is invalid:
+let r = regex!("(unclosed");
 
 ```
 Supported regex flags: `i`, `m`, `s`, `x`, `U`.

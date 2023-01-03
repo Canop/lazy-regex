@@ -9,7 +9,7 @@ license = "MIT"
 categories = ["text-processing"]
 repository = "https://github.com/Canop/lazy-regex"
 readme = "README.md"
-rust-version = "1.56"
+rust-version = "1.65"
 
 [dependencies]
 once_cell = "1.7"
