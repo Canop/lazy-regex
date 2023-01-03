@@ -9,4 +9,4 @@ readme = "README.md"
 
 [dependencies]
 lazy-regex = { path = "../.." }
-regex = "1.5"
+regex = "1.7"

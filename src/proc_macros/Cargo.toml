@@ -10,7 +10,7 @@ edition = "2018"
 syn = { version = "1.0.103", features = ["full"] }
 proc-macro2 = "1.0"
 quote = "1.0"
-regex = "1.5"
+regex = "1.7"
 
 [lib]
 proc-macro = true
