@@ -1,7 +1,8 @@
-<a name="v2.3.2"></a>
-### v2.3.2 - 2023-01-03
+<a name="v2.4.0"></a>
+### v2.4.0 - 2023-01-04
 - allow building with `--no-default-features`
 - regex crate upgraded from 1.5 to 1.7 (minor Unicode changes)
+- rustc minimal version now 1.65
 
 <a name="v2.3.1"></a>
 ### v2.3.1 - 2022-11-03
