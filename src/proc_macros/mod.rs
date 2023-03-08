@@ -6,7 +6,7 @@ use {
     proc_macro::TokenStream,
     quote::quote,
     std::convert::TryFrom,
-    syn::{parse_macro_input, Expr, ExprClosure},
+    syn::{parse_macro_input, Expr},
 };
 
 //  The following `process*` functions are convenience funcs
@@ -30,18 +30,6 @@ where
     let parsed = parse_macro_input!(input as RexValArgs);
     match RegexCode::try_from(parsed.regex_str) {
         Ok(r) => f(r, parsed.value).into(),
-        Err(e) => e.to_compile_error().into(),
-    }
-}
-
-fn process_with_value_fun<T, F>(input: TokenStream, f: F) -> TokenStream
-where
-    T: Into<TokenStream>,
-    F: Fn(RegexCode, Expr, ExprClosure) -> T,
-{
-    let parsed = parse_macro_input!(input as RexValFunArgs);
-    match RegexCode::try_from(parsed.regex_str) {
-        Ok(r) => f(r, parsed.value, parsed.fun).into(),
         Err(e) => e.to_compile_error().into(),
     }
 }
@@ -167,34 +155,52 @@ pub fn regex_captures(input: TokenStream) -> TokenStream {
 
 /// common implementation of regex_replace and regex_replace_all
 fn replacen(input: TokenStream, limit: usize) -> TokenStream {
-    process_with_value_fun(input, |regex_code, value, fun| {
-        let statick = regex_code.statick();
-        let n = regex_code.captures_len();
-        let groups = (0..n).map(|i| {
-            quote! {
-                caps.get(#i).map_or("", |c| c.as_str())
-            }
-        });
-        quote! {{
-            #statick;
-            RE.replacen(
-                #value,
-                #limit,
-                |caps: &lazy_regex::Captures<'_>| {
-                    let fun = #fun;
-                    fun(
-                        #(#groups),*
-                    )
-                })
-        }}
-    })
+    let parsed = parse_macro_input!(input as ReplaceArgs);
+    let ReplaceArgs { regex_str, value, replacer } = parsed;
+    let regex_code = match RegexCode::try_from(regex_str) {
+        Ok(r) => r,
+        Err(e) => {
+            return e.to_compile_error().into();
+        }
+    };
+    let statick = regex_code.statick();
+    let stream = match replacer {
+        MaybeFun::Fun(fun) => {
+            let n = regex_code.captures_len();
+            let groups = (0..n).map(|i| {
+                quote! {
+                    caps.get(#i).map_or("", |c| c.as_str())
+                }
+            });
+            quote! {{
+                #statick;
+                RE.replacen(
+                    #value,
+                    #limit,
+                    |caps: &lazy_regex::Captures<'_>| {
+                        let fun = #fun;
+                        fun(
+                            #(#groups),*
+                        )
+                    })
+            }}
+        }
+        MaybeFun::Expr(expr) => {
+            quote! {{
+                #statick;
+                RE.replacen(#value, #limit, #expr)
+            }}
+        }
+    };
+    stream.into()
 }
 
 /// Replaces the leftmost match in the second argument
-/// with the value returned by the closure given as third argument.
+/// using the replacer given as third argument.
 ///
-/// The closure is given one or more `&str`, the first one for
-/// the whole match and the following ones for the groups.
+/// When the replacer is a closure, it is given one or more `&str`,
+/// the first one for the whole match and the following ones for
+/// the groups.
 /// Any optional group with no value is replaced with `""`.
 ///
 /// Example:
@@ -213,10 +219,11 @@ pub fn regex_replace(input: TokenStream) -> TokenStream {
 }
 
 /// Replaces all non-overlapping matches in the second argument
-/// with the value returned by the closure given as third argument.
+/// using the replacer given as third argument.
 ///
-/// The closure is given one or more `&str`, the first one for
-/// the whole match and the following ones for the groups.
+/// When the replacer is a closure, it is given one or more `&str`,
+/// the first one for the whole match and the following ones for
+/// the groups.
 /// Any optional group with no value is replaced with `""`.
 ///
 /// Example:

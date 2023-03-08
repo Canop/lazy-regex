@@ -1,3 +1,6 @@
+### next
+- the `replace!` and `replace_all!` now supports non closure replacers - Fix #19
+
 <a name="v2.4.1"></a>
 ### v2.4.1 - 2023-01-05
 - rustc minimal version downgraded from 1.65 to to 1.56 by popular demand
