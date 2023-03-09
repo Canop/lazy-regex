@@ -23,23 +23,35 @@ impl Parse for RexValArgs {
 
 /// Wrapping of the three arguments given to the
 /// ``regex_replace` and regex_replace_all` macros
-pub(crate) struct RexValFunArgs {
+pub(crate) struct ReplaceArgs {
     pub regex_str: LitStr,
     pub value: Expr,
-    pub fun: ExprClosure,
+    pub replacer: MaybeFun,
 }
-impl Parse for RexValFunArgs {
+
+pub(crate) enum MaybeFun {
+    Fun(ExprClosure),
+    Expr(Expr),
+}
+
+impl Parse for ReplaceArgs {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let regex_str = input.parse::<LitStr>()?;
         input.parse::<Token![,]>()?;
         let value = input.parse::<Expr>()?;
         input.parse::<Token![,]>()?;
-        let fun = input.parse::<ExprClosure>()?;
+        // we try as a closure before, and as a general expr if
+        // it doesn't work out
+        let replacer = if let Ok(fun) = input.parse::<ExprClosure>() {
+            MaybeFun::Fun(fun)
+        } else {
+            MaybeFun::Expr(input.parse::<Expr>()?)
+        };
         let _ = input.parse::<Token![,]>(); // allow a trailing comma
-        Ok(RexValFunArgs {
+        Ok(ReplaceArgs {
             regex_str,
             value,
-            fun,
+            replacer,
         })
     }
 }

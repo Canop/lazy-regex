@@ -1,18 +1,15 @@
 /*!
 
-Use the  [regex!] macro to build regexes:
+With lazy-regex macros, regular expressions
 
-* they're checked at compile time
-* they're wrapped in `once_cell` lazy static initializers so that they're compiled only once
-* they can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
-* regex creation is less verbose
+* are checked at compile time, with clear error messages
+* are wrapped in `once_cell` lazy static initializers so that they're compiled only once
+* can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
+* are defined in a less verbose way
 
-This macro returns references to normal instances of [regex::Regex] or [regex::bytes::Regex] so all the usual features are available.
+The [regex!] macro returns references to normal instances of [regex::Regex] or [regex::bytes::Regex] so all the usual features are available.
 
-A special, non-standard flag, `B`, is used to indicate a `regex::bytes::Regex` variant,
-which operates on bytes (`&[u8]`) instead of `&str`s.
-
-You may also use shortcut macros for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:
+Other macros are specialized for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:
 
 * [regex_is_match!]
 * [regex_find!]
@@ -119,6 +116,10 @@ doc: [regex_captures!]
 
 # Replace with captured groups
 
+The [regex_replace!] and [regex_replace_all!] macros bring once compilation and compilation time checks to the `replace` and `replace_all` functions.
+
+## Replacing with a closure
+
 ```rust
 use lazy_regex::regex_replace_all;
 
@@ -132,7 +133,17 @@ assert_eq!(text, "F<oo>8 F<uu>3");
 ```
 The number of arguments given to the closure is checked at compilation time to match the number of groups in the regular expression.
 
-doc: [regex_replace!] and [regex_replace_all!]
+If it doesn't match you get, at compilation time, a clear error message.
+
+## Replacing with another kind of Replacer
+
+```rust
+use lazy_regex::regex_replace_all;
+let text = "UwU";
+let output = regex_replace_all!("U", text, "O");
+assert_eq!(&output, "OwO");
+```
+
 
 # Shared lazy static
 
@@ -173,3 +184,4 @@ pub use {
         },
     },
 };
+
