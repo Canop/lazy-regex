@@ -1,5 +1,6 @@
-### next
-- the `replace!` and `replace_all!` now supports non closure replacers - Fix #19
+<a name="v2.5.0"></a>
+### v2.5.0 - 2023-03-09
+- `replace!` and `replace_all!` now supports non closure replacers - Fix #19
 
 <a name="v2.4.1"></a>
 ### v2.4.1 - 2023-01-05

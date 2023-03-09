@@ -15,22 +15,24 @@
 
 # lazy-regex
 
-Use the  `regex!` macro to build regexes:
+With lazy-regex macros, regular expressions
 
-* they're checked at compile time
-* they're wrapped in `once_cell` lazy static initializers so that they're compiled only once
-* they can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
-* regex creation is less verbose
+* are checked at compile time, with clear error messages
+* are wrapped in `once_cell` lazy static initializers so that they're compiled only once
+* can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
+* are defined in a less verbose way
 
-This macro returns references to normal instances of `regex::Regex` so all the usual features are available.
+The `regex!` macro returns references to normal instances of `regex::Regex` or `regex::bytes::Regex` so all the usual features are available.
 
-You may also use shortcut macros for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:
+Other macros are specialized for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:
 
 * `regex_is_match!`
 * `regex_find!`
 * `regex_captures!`
 * `regex_replace!`
 * `regex_replace_all!`
+
+All of them support the `B` flag for the `regex::bytes::Regex` variant.
 
 Some structs of the regex crate are reexported to ease dependency managment.
 
@@ -55,6 +57,10 @@ assert_eq!(r.is_match("\"\""), true);
 let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
 assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 
+// build a regex that operates on &[u8]
+let r = regex!("(byte)?string$"B);
+assert_eq!(r.is_match(b"bytestring"), true);
+
 // there's no problem using the multiline definition syntax
 let r = regex!(r#"(?x)
     (?P<name>\w+)
@@ -64,13 +70,15 @@ let r = regex!(r#"(?x)
 assert_eq!(r.find("This is lazy_regex-2.2!").unwrap().as_str(), "lazy_regex-2.2");
 // (look at the regex_captures! macro to easily extract the groups)
 
-// this line wouldn't compile because the regex is invalid:
-// let r = regex!("(unclosed");
+```
+```compile_fail
+// this line doesn't compile because the regex is invalid:
+let r = regex!("(unclosed");
 
 ```
-Supported regex flags: 'i', 'm', 's', 'x', 'U'.
+Supported regex flags: `i`, `m`, `s`, `x`, `U`.
 
-See `regex::RegexBuilder`.
+See [regex::RegexBuilder](https://docs.rs/regex/latest/regex/struct.RegexBuilder.html).
 
 # Test a match
 
@@ -81,7 +89,6 @@ let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
 ```
 
-As for other macros, the main benefits here are that the regular expression is checked at compile time and compiled only once (lazily) in the life of your program.
 
 # Extract a value
 
@@ -90,6 +97,8 @@ use lazy_regex::regex_find;
 
 let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
 assert_eq!(f_word, Some("fox"));
+let f_word = regex_find!(r#"\bf\w+\b"#B, b"The forest is silent.");
+assert_eq!(f_word, Some(b"forest" as &[u8]));
 ```
 
 # Capture
@@ -114,8 +123,11 @@ It's checked at compile time to ensure you have the right number of capturing gr
 
 You receive `""` for optional groups with no value.
 
-
 # Replace with captured groups
+
+The [regex_replace!] and [regex_replace_all!] macros bring once compilation and compilation time checks to the `replace` and `replace_all` functions.
+
+## Replacing with a closure
 
 ```rust
 use lazy_regex::regex_replace_all;
@@ -129,6 +141,17 @@ let text = regex_replace_all!(
 assert_eq!(text, "F<oo>8 F<uu>3");
 ```
 The number of arguments given to the closure is checked at compilation time to match the number of groups in the regular expression.
+
+If it doesn't match you get, at compilation time, a clear error message.
+
+## Replacing with another kind of Replacer
+
+```rust
+use lazy_regex::regex_replace_all;
+let text = "UwU";
+let output = regex_replace_all!("U", text, "O");
+assert_eq!(&output, "OwO");
+```
 
 
 # Shared lazy static
