@@ -176,12 +176,25 @@ pub use {
         regex_replace_all,
     },
     once_cell::sync::Lazy,
+};
+
+#[cfg(not(feature = "lite"))]
+pub use {
     regex::{
+        self,
         Captures, Regex, RegexBuilder,
         bytes::{
             Regex as BytesRegex,
             RegexBuilder as BytesRegexBuilder
         },
+    },
+};
+
+#[cfg(feature = "lite")]
+pub use {
+    regex_lite::{
+        self as regex,
+        Captures, Regex, RegexBuilder,
     },
 };
 

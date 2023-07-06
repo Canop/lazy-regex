@@ -35,6 +35,7 @@ Other macros are specialized for testing a match, replacing with concise closure
 All of them support the `B` flag for the `regex::bytes::Regex` variant.
 
 Some structs of the regex crate are reexported to ease dependency managment.
+The regex crate itself is also reexported, to avoid the need to synchronize the versions/flavor (see [Features](#features_and_reexport) below)
 
 # Build Regexes
 
@@ -171,4 +172,18 @@ pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
 
 Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
 
+# Features and reexport
 
+With default features, `lazy-regex` use the `regex` crate with its default features, tailored for performances and complete Unicode support.
+
+You may enable a different set of regex features by directly enabling them when importing `lazy-regex`.
+
+It's also possible to use the [regex-lite](https://docs.rs/regex-lite/) crate instead of the [regex](https://docs.rs/regex/) crate by declaring the ``lite`` feature:
+
+```TOML
+lazy-regex = { version = "2.6.0", default-features = false, features = ["lite"] }
+```
+
+The `lite` flavor comes with slightly lower performances and a reduced Unicode support (see crate documentation) but also a much smaller binary size.
+
+If you need to refer to the regex crate in your code, prefer to use the reexport (i.e. `use lazy_regex::regex;`) so that you don't have a version or flavor conflict. When the `lite` feature is enabled, `lazy_regex::regex` refers to `regex_lite` so you don't have to change your code when switching regex engine.

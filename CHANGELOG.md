@@ -1,3 +1,6 @@
+### next (major)
+- the `lite` feature switches the engine to `regex-lite` instead of `regex`. The whole regex|regex-lite crate is reexported under `lazy_regex::regex`
+
 <a name="v2.5.0"></a>
 ### v2.5.0 - 2023-03-09
 - `replace!` and `replace_all!` now supports non closure replacers - Fix #19
