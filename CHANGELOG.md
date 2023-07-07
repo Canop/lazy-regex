@@ -1,5 +1,7 @@
-### next (major)
+<a name="v3.0.0"></a>
+### v3.0.0 - 2023-07-07
 - the `lite` feature switches the engine to `regex-lite` instead of `regex`. The whole regex|regex-lite crate is reexported under `lazy_regex::regex`
+- regex crate upgraded to 1.9
 
 <a name="v2.5.0"></a>
 ### v2.5.0 - 2023-03-09
