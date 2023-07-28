@@ -1,3 +1,7 @@
+<a name="v3.0.1"></a>
+### v3.0.1 - 2023-07-28
+- syn dependency updated to 2.0
+
 <a name="v3.0.0"></a>
 ### v3.0.0 - 2023-07-07
 - the `lite` feature switches the engine to `regex-lite` instead of `regex`. The whole regex|regex-lite crate is reexported under `lazy_regex::regex`

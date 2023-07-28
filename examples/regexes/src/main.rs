@@ -19,7 +19,7 @@ fn example_builds() {
     let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
     assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 
-    // this line wouldn't compile:
+    // Try to uncomment the following line to see the compilation error
     // let r = regex!("(unclosed");
 }
 
