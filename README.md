@@ -154,7 +154,6 @@ let output = regex_replace_all!("U", text, "O");
 assert_eq!(&output, "OwO");
 ```
 
-
 # Shared lazy static
 
 When a regular expression is used in several functions, you sometimes don't want
@@ -181,7 +180,7 @@ You may enable a different set of regex features by directly enabling them when 
 It's also possible to use the [regex-lite](https://docs.rs/regex-lite/) crate instead of the [regex](https://docs.rs/regex/) crate by declaring the ``lite`` feature:
 
 ```TOML
-lazy-regex = { version = "2.6.0", default-features = false, features = ["lite"] }
+lazy-regex = { version = "3.0", default-features = false, features = ["lite"] }
 ```
 
 The `lite` flavor comes with slightly lower performances and a reduced Unicode support (see crate documentation) but also a much smaller binary size.
