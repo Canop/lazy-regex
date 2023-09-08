@@ -178,7 +178,7 @@ fn replacen(input: TokenStream, limit: usize) -> TokenStream {
                     #value,
                     #limit,
                     |caps: &lazy_regex::Captures<'_>| {
-                        let fun = #fun;
+                        let mut fun = #fun;
                         fun(
                             #(#groups),*
                         )
