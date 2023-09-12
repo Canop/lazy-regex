@@ -1,3 +1,7 @@
+<a name="v3.0.2"></a>
+### v3.0.2 - 2023-09-12
+- replace macros now accept a mut closure as replacer - Fix #27
+
 <a name="v3.0.1"></a>
 ### v3.0.1 - 2023-07-28
 - syn dependency updated to 2.0
