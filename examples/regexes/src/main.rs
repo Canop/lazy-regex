@@ -21,6 +21,26 @@ fn example_builds() {
 
     // Try to uncomment the following line to see the compilation error
     // let r = regex!("(unclosed");
+
+    // build a bytes::Regex macro
+    let rb = bytes_regex!("b+");
+    assert!(rb.is_match(b"abcd"));
+    let rb = bytes_regex!("sa+b?$"i);
+    assert_eq!(rb.is_match(b"Saa"), true);
+
+    // build a bytes::Regex macro using the suffix syntax
+    let rb = regex!("b+"B);
+    assert!(rb.is_match(b"abcd"));
+
+    // 4 equivalent ways to build a case insensitive bytes::Regex
+    let case_insensitive_regex = bytes_regex!("^ab+$"i);
+    assert!(case_insensitive_regex.is_match(b"abB"));
+    let case_insensitive_regex = bytes_regex!("(?i)^ab+$");
+    assert!(case_insensitive_regex.is_match(b"abB"));
+    let case_insensitive_regex = regex!("^ab+$"iB);
+    assert!(case_insensitive_regex.is_match(b"abB"));
+    let case_insensitive_regex = regex!("(?i)^ab+$"B);
+    assert!(case_insensitive_regex.is_match(b"abB"));
 }
 
 fn example_is_match() {
