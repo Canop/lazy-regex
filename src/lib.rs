@@ -9,7 +9,7 @@ With lazy-regex macros, regular expressions
 
 The [regex!] macro returns references to normal instances of [regex::Regex] or [regex::bytes::Regex] so all the usual features are available.
 
-Other macros are specialized for testing a match, replacing with concise closures, or capturing groups as substrings in some common situations:
+But most often, you won't even use the `regex!` macro but the other macros which are specialized for testing a match, replacing, or capturing groups in some common situations:
 
 * [regex_is_match!]
 * [regex_find!]
@@ -18,6 +18,8 @@ Other macros are specialized for testing a match, replacing with concise closure
 * [regex_replace_all!]
 
 All of them support the `B` flag for the `regex::bytes::Regex` variant.
+
+All macros exist with a `bytes_` prefix for building `bytes::Regex`, so you also have [bytes_regex!], [regex_is_match!], [regex_find!], [regex_captures!], [regex_replace!], and [regex_replace_all!].
 
 Some structs of the regex crate are reexported to ease dependency managment.
 
@@ -61,16 +63,25 @@ assert_eq!(r.find("This is lazy_regex-2.2!").unwrap().as_str(), "lazy_regex-2.2"
 let r = regex!("(unclosed");
 
 ```
-Supported regex flags: `i`, `m`, `s`, `x`, `U`.
+Supported regex flags: [`i`, `m`, `s`, `x`, `U`][regex::RegexBuilder], and you may also use `B` to build a bytes regex.
 
-See [regex::RegexBuilder].
+The following regexes are equivalent:
+* `bytes_regex!("^ab+$"i)`
+* `bytes_regex!("(?i)^ab+$")`
+* `regex!("^ab+$"iB)`
+* `regex!("(?i)^ab+$"B)`
+
+They're all case insensitive instances of `regex::bytes::Regex`.
+
 
 # Test a match
 
 ```rust
-use lazy_regex::regex_is_match;
+use lazy_regex::*;
 
 let b = regex_is_match!("[ab]+", "car");
+assert_eq!(b, true);
+let b = bytes_regex_is_match!("[ab]+", b"car");
 assert_eq!(b, true);
 ```
 
@@ -168,12 +179,20 @@ doc: [lazy_regex!]
 
 pub use {
     lazy_regex_proc_macros::{
-        lazy_regex, regex,
+        lazy_regex,
+        regex,
         regex_captures,
         regex_find,
         regex_is_match,
         regex_replace,
         regex_replace_all,
+        bytes_lazy_regex,
+        bytes_regex,
+        bytes_regex_captures,
+        bytes_regex_find,
+        bytes_regex_is_match,
+        bytes_regex_replace,
+        bytes_regex_replace_all,
     },
     once_cell::sync::Lazy,
 };

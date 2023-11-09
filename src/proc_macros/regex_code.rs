@@ -2,7 +2,6 @@ use {
     proc_macro::TokenStream,
     proc_macro2::TokenStream as TokenStream2,
     quote::quote,
-    std::convert::TryFrom,
     syn::LitStr,
 };
 
@@ -18,17 +17,17 @@ pub(crate) enum RegexInstance {
     Bytes(regex::bytes::Regex),
 }
 
-impl TryFrom<LitStr> for RegexCode {
-    type Error = syn::Error;
-
-    fn try_from(lit_str: LitStr) -> Result<Self, Self::Error> {
+impl RegexCode {
+    pub fn from_token_stream(token_stream: TokenStream, is_bytes: bool) -> Result<Self, syn::Error> {
+        Self::from_lit_str(syn::parse::<syn::LitStr>(token_stream)?, is_bytes)
+    }
+    pub fn from_lit_str(lit_str: LitStr, mut is_bytes: bool) -> Result<Self, syn::Error> {
         let pattern = lit_str.value();
         let mut case_insensitive = false;
         let mut multi_line = false;
         let mut dot_matches_new_line = false;
         let mut ignore_whitespace = false;
         let mut swap_greed = false;
-        let mut is_bytes = false;
         for (i, ch) in lit_str.suffix().chars().enumerate() {
             match ch {
                 'i' => case_insensitive = true,
@@ -75,14 +74,6 @@ impl TryFrom<LitStr> for RegexCode {
             })
         };
         Ok(Self { build, regex })
-    }
-}
-
-impl TryFrom<TokenStream> for RegexCode {
-    type Error = syn::Error;
-
-    fn try_from(token_stream: TokenStream) -> Result<Self, Self::Error> {
-        Self::try_from(syn::parse::<syn::LitStr>(token_stream)?)
     }
 }
 
