@@ -5,6 +5,7 @@ authors = ["Canop <cano.petrole@gmail.com>"]
 description = "proc macros for the lazy_regex crate"
 license = "MIT"
 edition = "2018"
+repository = "https://github.com/Canop/lazy-regex/tree/main/src/proc_macros"
 
 [dependencies]
 syn = { version = "2.0", features = ["full"] }
