@@ -186,3 +186,7 @@ lazy-regex = { version = "3.0", default-features = false, features = ["lite"] }
 The `lite` flavor comes with slightly lower performances and a reduced Unicode support (see crate documentation) but also a much smaller binary size.
 
 If you need to refer to the regex crate in your code, prefer to use the reexport (i.e. `use lazy_regex::regex;`) so that you don't have a version or flavor conflict. When the `lite` feature is enabled, `lazy_regex::regex` refers to `regex_lite` so you don't have to change your code when switching regex engine.
+
+## `#![no_std]` support
+
+If you need to use this crate in a `no_std` environment, you must enable the "critical-section" feature.
