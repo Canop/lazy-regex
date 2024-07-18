@@ -13,7 +13,7 @@ rust-version = "1.56"
 
 [dependencies]
 once_cell = { version = "1.17", default-features = false }
-regex = {version = "1.9", default_features = false, optional = true}
+regex = {version = "1.9", default-features = false, optional = true}
 regex-lite = {version = "0.1", optional = true}
 
 [dependencies.lazy-regex-proc_macros]
