@@ -436,3 +436,115 @@ pub fn regex_replace_all(input: TokenStream) -> TokenStream {
 pub fn bytes_regex_replace_all(input: TokenStream) -> TokenStream {
     bytes_replacen(input, 0)
 }
+
+/// Return an Option<T>, with T being the type returned by the block or expression
+/// given as third argument.
+///
+/// If the regex matches, executes the expression and return it as Some.
+/// Return None if the regex doesn't match.
+///
+/// ```
+///  let grey = regex_if!(r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#, "grey(22)", {
+///      level.parse().unwrap()
+///  });
+///  assert_eq!(grey, Some(22));
+/// ```
+#[proc_macro]
+pub fn regex_if(input: TokenStream) -> TokenStream {
+    let RexIfArgs {
+        regex_str,
+        value,
+        then,
+    } = parse_macro_input!(input as RexIfArgs);
+    let regex_code = match RegexCode::from_lit_str(regex_str, false) {
+        Ok(r) => r,
+        Err(e) => {
+            return e.to_compile_error().into();
+        }
+    };
+    let statick = regex_code.statick();
+    let assigns = regex_code.named_groups().into_iter().map(|(idx, name)| {
+        let var_name = syn::Ident::new(name, proc_macro2::Span::call_site());
+        quote! {
+            let #var_name: &str = caps.get(#idx).map_or("", |c| c.as_str());
+        }
+    });
+    quote! {{
+        #statick;
+        match RE.captures(#value) {
+            Some(caps) => {
+                #(#assigns);*
+                Some(#then)
+            }
+            None => None,
+        }
+    }}.into()
+}
+
+/// Define a set of lazy static statically compiled regexes, with a block
+/// or expression for each one. The first matching expression is computed
+/// with the named capture groups declaring `&str` variables available for this
+/// computation.
+/// If no regex matches, return `None`.
+///
+/// Example:
+/// ```
+/// #[derive(Debug, PartialEq)]
+/// enum Color {
+///     Grey(u8),
+///     Pink,
+///     Rgb(u8, u8, u8),
+/// }
+/// let input = "rgb(1, 2, 3)";
+/// let color = regex_switch!(input,
+///     r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#i => {
+///         Color::Grey(level.parse()?)
+///     }
+///     "^pink"i => Color::Pink,
+///     r#"^rgb\((?<r>\d+),\s*(?<g>\d+),\s*(?<b>\d+),?\)$"#i => Color::Rgb (
+///         r.parse()?,
+///         g.parse()?,
+///         b.parse()?,
+///     ),
+/// );
+/// assert_eq!(color, Some(Color::Rgb(1, 2, 3)));
+/// ```
+#[proc_macro]
+pub fn regex_switch(input: TokenStream) -> TokenStream {
+    let RexSwitchArgs {
+        value,
+        arms,
+    } = parse_macro_input!(input as RexSwitchArgs);
+    let mut q_arms = Vec::new();
+    for RexSwitchArmArgs { regex_str, then } in arms.into_iter() {
+        let regex_code = match RegexCode::from_lit_str(regex_str, false) {
+            Ok(r) => r,
+            Err(e) => {
+                return e.to_compile_error().into();
+            }
+        };
+        let statick = regex_code.statick();
+        let assigns = regex_code.named_groups().into_iter().map(|(idx, name)| {
+            let var_name = syn::Ident::new(name, proc_macro2::Span::call_site());
+            quote! {
+                let #var_name: &str = caps.get(#idx).map_or("", |c| c.as_str());
+            }
+        });
+        q_arms.push(
+            quote! {{
+                #statick;
+                if let Some(caps) = RE.captures(#value) {
+                    #(#assigns);*
+                    let output = Some(#then);
+                    break 'switch output;
+                }
+            }}
+        );
+    }
+    quote! {{
+        'switch: {
+            #(#q_arms)*
+            None
+        }
+    }}.into()
+}
