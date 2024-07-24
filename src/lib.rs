@@ -200,6 +200,7 @@ pub use {
         bytes_regex_is_match,
         bytes_regex_replace,
         bytes_regex_replace_all,
+        bytes_regex_switch,
     },
     once_cell::sync::Lazy,
 };

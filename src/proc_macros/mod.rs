@@ -582,3 +582,73 @@ pub fn regex_switch(input: TokenStream) -> TokenStream {
         }
     }}.into()
 }
+
+/// Define a set of lazy static statically compiled regexes, with a block
+/// or expression for each one. The first matching expression is computed
+/// with the named capture groups declaring `&str` variables available for this
+/// computation.
+/// If no regex matches, return `None`.
+///
+/// Example:
+/// ```
+/// #[derive(Debug, PartialEq)]
+/// enum Color {
+///     Grey(u8),
+///     Pink,
+///     Rgb(u8, u8, u8),
+/// }
+///
+/// let input = "rgb(1, 2, 3)";
+/// let color = regex_switch!(input,
+///     r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#i => {
+///         Color::Grey(level.parse()?)
+///     }
+///     "^pink"i => Color::Pink,
+///     r#"^rgb\((?<r>\d+),\s*(?<g>\d+),\s*(?<b>\d+),?\)$"#i => Color::Rgb (
+///         r.parse()?,
+///         g.parse()?,
+///         b.parse()?,
+///     ),
+/// );
+/// assert_eq!(color, Some(Color::Rgb(1, 2, 3)));
+///
+/// ```
+#[proc_macro]
+pub fn bytes_regex_switch(input: TokenStream) -> TokenStream {
+    let RexSwitchArgs {
+        value,
+        arms,
+    } = parse_macro_input!(input as RexSwitchArgs);
+    let mut q_arms = Vec::new();
+    for RexSwitchArmArgs { regex_str, then } in arms.into_iter() {
+        let regex_code = match RegexCode::from_lit_str(regex_str, true) {
+            Ok(r) => r,
+            Err(e) => {
+                return e.to_compile_error().into();
+            }
+        };
+        let statick = regex_code.statick();
+        let assigns = regex_code.named_groups().into_iter().map(|(idx, name)| {
+            let var_name = syn::Ident::new(name, proc_macro2::Span::call_site());
+            quote! {
+                let #var_name: &[u8] = caps.get(#idx).map_or(&b""[..], |c| c.as_bytes());
+            }
+        });
+        q_arms.push(
+            quote! {{
+                #statick;
+                if let Some(caps) = RE.captures(#value) {
+                    #(#assigns);*
+                    let output = Some(#then);
+                    break 'switch output;
+                }
+            }}
+        );
+    }
+    quote! {{
+        'switch: {
+            #(#q_arms)*
+            None
+        }
+    }}.into()
+}

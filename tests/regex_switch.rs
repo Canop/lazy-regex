@@ -1,5 +1,5 @@
 use {
-    lazy_regex::regex_switch,
+    lazy_regex::*,
     std::num::ParseIntError,
 };
 
@@ -53,4 +53,32 @@ fn test_regex_switch_with_error_handling() -> Result<(), ParseIntError> {
     );
     assert_eq!(color, Some(Color::Rgb(1, 2, 3)));
     Ok(())
+}
+
+#[test]
+fn test_bytes_regex_switch() {
+    #[derive(Debug, PartialEq, Eq)]
+    enum Color {
+        Grey(u8),
+        Pink,
+        Rgb(u8, u8, u8),
+    }
+    fn read(s: &[u8]) -> Option<Color> {
+        bytes_regex_switch!(s,
+            r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#i => {
+                Color::Grey(std::str::from_utf8(level).unwrap().parse().unwrap())
+            }
+            "^pink"i => Color::Pink,
+            r#"^rgb\((?<r>\d+),\s*(?<g>\d+),\s*(?<b>\d+),?\)$"#i => Color::Rgb (
+                std::str::from_utf8(r).unwrap().parse().unwrap(),
+                std::str::from_utf8(g).unwrap().parse().unwrap(),
+                std::str::from_utf8(b).unwrap().parse().unwrap(),
+            ),
+        )
+    }
+    assert_eq!(read(b"gray(15)"), Some(Color::Grey(15)));
+    assert_eq!(read(b"pInk"), Some(Color::Pink));
+    assert_eq!(read(b"pinkie"), Some(Color::Pink));
+    assert_eq!(read(b"red"), None);
+    assert_eq!(read(b"rgb(1,2,3)"), Some(Color::Rgb(1, 2, 3)));
 }
