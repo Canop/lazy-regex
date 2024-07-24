@@ -17,9 +17,9 @@ But most often, you won't even use the `regex!` macro but the other macros which
 * [regex_replace!]
 * [regex_replace_all!]
 
-All of them support the `B` flag for the `regex::bytes::Regex` variant.
+They support the `B` flag for the `regex::bytes::Regex` variant.
 
-All macros exist with a `bytes_` prefix for building `bytes::Regex`, so you also have [bytes_regex!], [regex_is_match!], [regex_find!], [regex_captures!], [regex_replace!], and [regex_replace_all!].
+All macros exist with a `bytes_` prefix for building `bytes::Regex`, so you also have [bytes_regex!], [bytes_regex_is_match!], [bytes_regex_find!], [bytes_regex_captures!], [bytes_regex_replace!], and [bytes_regex_replace_all!].
 
 Some structs of the regex crate are reexported to ease dependency managment.
 

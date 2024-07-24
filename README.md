@@ -32,7 +32,9 @@ Other macros are specialized for testing a match, replacing with concise closure
 * `regex_replace!`
 * `regex_replace_all!`
 
-All of them support the `B` flag for the `regex::bytes::Regex` variant.
+They support the `B` flag for the `regex::bytes::Regex` variant.
+
+All macros exist with a `bytes_` prefix for building `bytes::Regex`, so you also have `bytes_regex!`, `bytes_regex_is_match!`, `bytes_regex_find!`, `bytes_regex_captures!`, `bytes_regex_replace!`, and `bytes_regex_replace_all!`.
 
 Some structs of the regex crate are reexported to ease dependency managment.
 The regex crate itself is also reexported, to avoid the need to synchronize the versions/flavor (see [Features](#features_and_reexport) below)
