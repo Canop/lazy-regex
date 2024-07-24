@@ -196,6 +196,7 @@ pub use {
         bytes_regex,
         bytes_regex_captures,
         bytes_regex_find,
+        bytes_regex_if,
         bytes_regex_is_match,
         bytes_regex_replace,
         bytes_regex_replace_all,

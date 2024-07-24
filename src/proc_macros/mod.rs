@@ -481,6 +481,38 @@ pub fn regex_if(input: TokenStream) -> TokenStream {
     }}.into()
 }
 
+#[proc_macro]
+pub fn bytes_regex_if(input: TokenStream) -> TokenStream {
+    let RexIfArgs {
+        regex_str,
+        value,
+        then,
+    } = parse_macro_input!(input as RexIfArgs);
+    let regex_code = match RegexCode::from_lit_str(regex_str, true) {
+        Ok(r) => r,
+        Err(e) => {
+            return e.to_compile_error().into();
+        }
+    };
+    let statick = regex_code.statick();
+    let assigns = regex_code.named_groups().into_iter().map(|(idx, name)| {
+        let var_name = syn::Ident::new(name, proc_macro2::Span::call_site());
+        quote! {
+            let #var_name: &[u8] = caps.get(#idx).map_or(&b""[..], |c| c.as_bytes());
+        }
+    });
+    quote! {{
+        #statick;
+        match RE.captures(#value) {
+            Some(caps) => {
+                #(#assigns);*
+                Some(#then)
+            }
+            None => None,
+        }
+    }}.into()
+}
+
 /// Define a set of lazy static statically compiled regexes, with a block
 /// or expression for each one. The first matching expression is computed
 /// with the named capture groups declaring `&str` variables available for this
@@ -495,6 +527,7 @@ pub fn regex_if(input: TokenStream) -> TokenStream {
 ///     Pink,
 ///     Rgb(u8, u8, u8),
 /// }
+///
 /// let input = "rgb(1, 2, 3)";
 /// let color = regex_switch!(input,
 ///     r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#i => {
@@ -508,6 +541,7 @@ pub fn regex_if(input: TokenStream) -> TokenStream {
 ///     ),
 /// );
 /// assert_eq!(color, Some(Color::Rgb(1, 2, 3)));
+///
 /// ```
 #[proc_macro]
 pub fn regex_switch(input: TokenStream) -> TokenStream {

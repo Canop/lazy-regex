@@ -1,5 +1,8 @@
 use {
-    lazy_regex::regex_if,
+    lazy_regex::{
+        bytes_regex_if,
+        regex_if,
+    },
     std::num::ParseIntError,
 };
 
@@ -28,3 +31,19 @@ fn test_regex_if_with_error_handling() {
     assert!(extract_grey_level("grey(268)").is_err());
     assert_eq!(extract_grey_level("red"), Ok(None));
 }
+
+#[test]
+fn test_bytes_regex_if() {
+    fn extract_grey_level(s: &[u8]) -> Option<u16> {
+        bytes_regex_if!(
+            r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#,
+            s,
+            std::str::from_utf8(level).unwrap().parse().unwrap()
+        )
+    }
+    assert_eq!(extract_grey_level(b"gray(15)"), Some(15));
+    assert_eq!(extract_grey_level(b"grey(22)"), Some(22));
+    assert_eq!(extract_grey_level(b"grey(268)"), None);
+    assert_eq!(extract_grey_level(b"red"), None);
+}
+
