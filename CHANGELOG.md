@@ -1,4 +1,5 @@
-### next
+<a name="v3.2.0"></a>
+### v3.2.0 - 2024-07-25
 - `regex_if!` and `bytes_regex_if!`
 - `regex_switch!` and `bytes_regex_switch!`
 
