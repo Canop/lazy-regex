@@ -31,10 +31,11 @@ Other macros are specialized for testing a match, replacing with concise closure
 * `regex_captures!`
 * `regex_replace!`
 * `regex_replace_all!`
+* `regex_switch!`
 
 They support the `B` flag for the `regex::bytes::Regex` variant.
 
-All macros exist with a `bytes_` prefix for building `bytes::Regex`, so you also have `bytes_regex!`, `bytes_regex_is_match!`, `bytes_regex_find!`, `bytes_regex_captures!`, `bytes_regex_replace!`, and `bytes_regex_replace_all!`.
+All macros exist with a `bytes_` prefix for building `bytes::Regex`, so you also have `bytes_regex!`, `bytes_regex_is_match!`, `bytes_regex_find!`, `bytes_regex_captures!`, `bytes_regex_replace!`, `bytes_regex_replace_all!`, and `bytes_regex_switch!`.
 
 Some structs of the regex crate are reexported to ease dependency managment.
 The regex crate itself is also reexported, to avoid the need to synchronize the versions/flavor (see [Features](#features_and_reexport) below)
@@ -130,7 +131,7 @@ You receive `""` for optional groups with no value.
 
 The [regex_replace!] and [regex_replace_all!] macros bring once compilation and compilation time checks to the `replace` and `replace_all` functions.
 
-## Replacing with a closure
+## Replace with a closure
 
 ```rust
 use lazy_regex::regex_replace_all;
@@ -147,13 +148,38 @@ The number of arguments given to the closure is checked at compilation time to m
 
 If it doesn't match you get, at compilation time, a clear error message.
 
-## Replacing with another kind of Replacer
+## Replace with another kind of Replacer
 
 ```rust
 use lazy_regex::regex_replace_all;
 let text = "UwU";
 let output = regex_replace_all!("U", text, "O");
 assert_eq!(&output, "OwO");
+```
+
+# Switch over regexes
+
+Execute the expression bound to the first matching regex, with named captured groups declared as varibles:
+
+```rust
+use lazy_regex::regex_switch;
+pub enum ScrollCommand {
+    Top,
+    Bottom,
+    Lines(i32),
+    Pages(i32),
+}
+impl std::str::FromStr for ScrollCommand {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, ()> {
+        regex_switch!(s,
+            "^scroll-to-top$" => Self::Top,
+            "^scroll-to-bottom$" => Self::Bottom,
+            r#"^scroll-lines?\((?<n>[+-]?\d{1,4})\)$"# => Self::Lines(n.parse().unwrap()),
+            r#"^scroll-pages?\((?<n>[+-]?\d{1,4})\)$"# => Self::Pages(n.parse().unwrap()),
+        ).ok_or(())
+    }
+}
 ```
 
 # Shared lazy static

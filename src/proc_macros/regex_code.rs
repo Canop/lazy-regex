@@ -103,4 +103,18 @@ impl RegexCode {
             RegexInstance::Bytes(regex) => regex.captures_len(),
         }
     }
+    pub fn named_groups(&self) -> Vec<(usize, &str)> {
+        match &self.regex {
+            RegexInstance::Regex(regex) => regex
+                .capture_names()
+                .enumerate()
+                .filter_map(|(i, n)| Some((i, n?)))
+                .collect(),
+            RegexInstance::Bytes(regex) => regex
+                .capture_names()
+                .enumerate()
+                .filter_map(|(i, n)| Some((i, n?)))
+                .collect(),
+        }
+    }
 }
