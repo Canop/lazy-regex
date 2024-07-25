@@ -1,3 +1,7 @@
+### next
+- `regex_if!` and `bytes_regex_if!`
+- `regex_switch!` and `bytes_regex_switch!`
+
 <a name="v3.1.0"></a>
 ### v3.1.0 - 2023-11-09
 - bytes_ prefixed macros create instances of `bytes::Regex` - Fix #30
