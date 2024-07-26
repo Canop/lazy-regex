@@ -129,7 +129,7 @@ You receive `""` for optional groups with no value.
 
 # Replace with captured groups
 
-The [regex_replace!] and [regex_replace_all!] macros bring once compilation and compilation time checks to the `replace` and `replace_all` functions.
+The `regex_replace!` and `regex_replace_all!` macros bring once compilation and compilation time checks to the `replace` and `replace_all` functions.
 
 ## Replace with a closure
 
