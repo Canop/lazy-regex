@@ -204,10 +204,6 @@ doc: [lazy_regex!]
 
 */
 
-#![cfg_attr(not(feature = "std"), no_std)]
-#[cfg(all(feature = "std", feature = "critical-section"))]
-compile_error!("The `critical-section` flag should only be used in embedded envrionemnts without a standard library.");
-
 pub use {
     lazy_regex_proc_macros::{
         lazy_regex,

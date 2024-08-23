@@ -1,3 +1,7 @@
+<a name="v3.3.0"></a>
+### v3.3.0 - 2024-08-23
+- revert a change regarding dependencies & features, brought with 3.2.0, which proved to be uncovenient for configuration with no default features - Fix #36
+
 <a name="v3.2.0"></a>
 ### v3.2.0 - 2024-07-25
 - `regex_if!` and `bytes_regex_if!`
