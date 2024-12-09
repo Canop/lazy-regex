@@ -3,7 +3,7 @@
 With lazy-regex macros, regular expressions
 
 * are checked at compile time, with clear error messages
-* are wrapped in `once_cell` lazy static initializers so that they're compiled only once
+* are wrapped in `std` lazy static initializers so that they're compiled only once
 * can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
 * are defined in a less verbose way
 
@@ -195,7 +195,7 @@ If you want to have a shared lazy static regex, use the [lazy_regex!] macro:
 ```rust
 use lazy_regex::*;
 
-pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
+pub static GLOBAL_REX: LazyLock<Regex> = lazy_regex!("^ab+$"i);
 ```
 
 Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
@@ -225,7 +225,7 @@ pub use {
         bytes_regex_replace_all,
         bytes_regex_switch,
     },
-    once_cell::sync::Lazy,
+    std::sync::LazyLock
 };
 
 #[cfg(not(feature = "lite"))]
