@@ -61,7 +61,7 @@ impl RegexCode {
             quote!(RegexBuilder)
         };
         let build = quote! {
-            lazy_regex::Lazy::new(|| {
+            std::sync::LazyLock::new(|| {
                 //println!("compiling regex {:?}", #pattern);
                 lazy_regex:: #builder_token ::new(#pattern)
                     .case_insensitive(#case_insensitive)
@@ -85,7 +85,7 @@ impl RegexCode {
             RegexInstance::Bytes(..) => quote!(BytesRegex),
         };
         quote! {
-            static RE: lazy_regex::Lazy<lazy_regex:: #regex_token > = #build;
+            static RE: std::sync::LazyLock<lazy_regex:: #regex_token > = #build;
         }
     }
 

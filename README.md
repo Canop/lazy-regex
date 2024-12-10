@@ -18,7 +18,7 @@
 With lazy-regex macros, regular expressions
 
 * are checked at compile time, with clear error messages
-* are wrapped in `once_cell` lazy static initializers so that they're compiled only once
+* are wrapped in `std` lazy static initializers so that they're compiled only once
 * can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
 * are defined in a less verbose way
 

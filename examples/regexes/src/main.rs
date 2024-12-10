@@ -1,6 +1,6 @@
 use lazy_regex::*;
 
-pub static SHARED: Lazy<Regex> = lazy_regex!("^test$");
+pub static SHARED: LazyLock<Regex> = lazy_regex!("^test$");
 
 fn example_builds() {
     // build a simple regex

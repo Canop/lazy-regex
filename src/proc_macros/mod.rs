@@ -67,14 +67,14 @@ pub fn bytes_regex(input: TokenStream) -> TokenStream {
     process(input, true, |regex_code| regex_code.lazy_static())
 }
 
-/// Return an instance of `once_cell::sync::Lazy<regex::Regex>` or
-/// `once_cell::sync::Lazy<regex::bytes::Regex>` that
+/// Return an instance of `LazyLock<regex::Regex>` or
+/// `LazyLock<regex::bytes::Regex>` that
 /// you can use in a public static declaration.
 ///
 /// Example:
 ///
 /// ```
-/// pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
+/// pub static GLOBAL_REX: LazyLock<Regex> = lazy_regex!("^ab+$"i);
 /// ```
 ///
 /// As for other macros, the regex is checked at compilation time.
@@ -83,13 +83,13 @@ pub fn lazy_regex(input: TokenStream) -> TokenStream {
     process(input, false, |regex_code| regex_code.build)
 }
 
-/// Return an instance of `once_cell::sync::Lazy<bytes::Regex>` that
+/// Return an instance of `LazyLock<bytes::Regex>` that
 /// you can use in a public static declaration.
 ///
 /// Example:
 ///
 /// ```
-/// pub static GLOBAL_REX: Lazy<bytes::Regex> = bytes_lazy_regex!("^ab+$"i);
+/// pub static GLOBAL_REX: LazyLock<bytes::Regex> = bytes_lazy_regex!("^ab+$"i);
 /// ```
 ///
 /// As for other macros, the regex is checked at compilation time.
