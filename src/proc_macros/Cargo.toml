@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex-proc_macros"
-version = "3.4.0"
+version = "3.4.1"
 authors = ["Canop <cano.petrole@gmail.com>"]
 description = "proc macros for the lazy_regex crate"
 license = "MIT"

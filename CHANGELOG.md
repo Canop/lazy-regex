@@ -1,5 +1,5 @@
-<a name="v3.4.0"></a>
-### v3.4.0 - 2024-12-27
+<a name="v3.4.1"></a>
+### v3.4.1 - 2024-12-27
 - regex_captures_iter! macro - Fix #37
 
 <a name="v3.3.0"></a>
