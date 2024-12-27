@@ -13,11 +13,11 @@ fn test_regex_switch() {
     }
     fn read(s: &str) -> Option<Color> {
         regex_switch!(s,
-            r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#i => {
+            r"^gr(a|e)y\((?<level>\d{1,2})\)$"i => {
                 Color::Grey(level.parse().unwrap())
             }
             "^pink"i => Color::Pink,
-            r#"^rgb\((?<r>\d+),\s*(?<g>\d+),\s*(?<b>\d+),?\)$"#i => Color::Rgb (
+            r"^rgb\((?<r>\d+),\s*(?<g>\d+),\s*(?<b>\d+),?\)$"i => Color::Rgb (
                 r.parse().unwrap(),
                 g.parse().unwrap(),
                 b.parse().unwrap(),

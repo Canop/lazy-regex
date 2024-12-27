@@ -260,6 +260,46 @@ pub fn bytes_regex_captures(input: TokenStream) -> TokenStream {
     })
 }
 
+/// Returns an iterator that yields successive non-overlapping matches in the given haystack.
+/// The iterator yields values of type `regex::Captures`.
+///
+/// Example (adapted from the regex crate):
+/// ```
+/// let hay = "'Citizen Kane' (1941), 'The Wizard of Oz' (1939), 'M' (1931).";
+/// let mut movies = vec![];
+/// let iter = regex_captures_iter!(r"'([^']+)'\s+\(([0-9]{4})\)", hay);
+/// for (_, [title, year]) in iter.map(|c| c.extract()) {
+///     movies.push((title, year.parse::<i64>().unwrap()));
+/// }
+/// assert_eq!(movies, vec![
+///     ("Citizen Kane", 1941),
+///     ("The Wizard of Oz", 1939),
+///     ("M", 1931),
+/// ]);
+/// ```
+#[proc_macro]
+pub fn regex_captures_iter(input: TokenStream) -> TokenStream {
+    process_with_value(input, false, |regex_code, value| {
+        let statick = regex_code.statick();
+        quote! {{
+            #statick;
+            RE.captures_iter(#value)
+        }}
+    })
+}
+
+/// Returns an iterator that yields successive non-overlapping matches in the given haystack.
+#[proc_macro]
+pub fn bytes_regex_captures_iter(input: TokenStream) -> TokenStream {
+    process_with_value(input, true, |regex_code, value| {
+        let statick = regex_code.statick();
+        quote! {{
+            #statick;
+            RE.captures_iter(#value)
+        }}
+    })
+}
+
 /// common implementation of regex_replace and regex_replace_all
 fn replacen(input: TokenStream, limit: usize) -> TokenStream {
     let parsed = parse_macro_input!(input as ReplaceArgs);

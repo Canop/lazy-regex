@@ -11,12 +11,11 @@ The [regex!] macro returns references to normal instances of [regex::Regex] or [
 
 But most often, you won't even use the `regex!` macro but the other macros which are specialized for testing a match, replacing, or capturing groups in some common situations:
 
-* [regex_is_match!]
-* [regex_find!]
-* [regex_captures!]
-* [regex_replace!]
-* [regex_replace_all!]
-* [regex_switch!]
+* [Test a match](#test-a-match) with [regex_is_match!]
+* [Extract a value](#extract-a-value) with [regex_find!]
+* [Capture](#capture) with [regex_captures!] and [regex_captures_iter!]
+* [Replace with captured groups](#replace-with-captured-groups) with [regex_replace!] and [regex_replace_all!]
+* [Switch over patterns](#switch-over-patterns) with [regex_switch!]
 
 They support the `B` flag for the `regex::bytes::Regex` variant.
 
@@ -50,11 +49,11 @@ let r = regex!("(byte)?string$"B);
 assert_eq!(r.is_match(b"bytestring"), true);
 
 // there's no problem using the multiline definition syntax
-let r = regex!(r#"(?x)
+let r = regex!(r"(?x)
     (?P<name>\w+)
     -
     (?P<version>[0-9.]+)
-"#);
+");
 assert_eq!(r.find("This is lazy_regex-2.2!").unwrap().as_str(), "lazy_regex-2.2");
 // (look at the regex_captures! macro to easily extract the groups)
 
@@ -94,9 +93,9 @@ doc: [regex_is_match!]
 ```rust
 use lazy_regex::regex_find;
 
-let f_word = regex_find!(r#"\bf\w+\b"#, "The fox jumps.");
+let f_word = regex_find!(r"\bf\w+\b", "The fox jumps.");
 assert_eq!(f_word, Some("fox"));
-let f_word = regex_find!(r#"\bf\w+\b"#B, b"The forest is silent.");
+let f_word = regex_find!(r"\bf\w+\b"B, b"The forest is silent.");
 assert_eq!(f_word, Some(b"forest" as &[u8]));
 ```
 
@@ -111,7 +110,7 @@ let (_, letter) = regex_captures!("([a-z])[0-9]+"i, "form A42").unwrap();
 assert_eq!(letter, "A");
 
 let (whole, name, version) = regex_captures!(
-    r#"(\w+)-([0-9.]+)"#, // a literal regex
+    r"(\w+)-([0-9.]+)", // a literal regex
     "This is lazy_regex-2.0!", // any expression
 ).unwrap();
 assert_eq!(whole, "lazy_regex-2.0");
@@ -124,7 +123,7 @@ It's checked at compile time to ensure you have the right number of capturing gr
 
 You receive `""` for optional groups with no value.
 
-doc: [regex_captures!]
+See [regex_captures!] and [regex_captures_iter!]
 
 # Replace with captured groups
 
@@ -137,7 +136,7 @@ use lazy_regex::regex_replace_all;
 
 let text = "Foo8 fuu3";
 let text = regex_replace_all!(
-    r#"\bf(\w+)(\d)"#i,
+    r"\bf(\w+)(\d)"i,
     text,
     |_, name, digit| format!("F<{}>{}", name, digit),
 );
@@ -145,7 +144,7 @@ assert_eq!(text, "F<oo>8 F<uu>3");
 ```
 The number of arguments given to the closure is checked at compilation time to match the number of groups in the regular expression.
 
-If it doesn't match you get, at compilation time, a clear error message.
+If it doesn't match you get a clear error message at compilation time.
 
 ## Replace with another kind of Replacer
 
@@ -156,29 +155,34 @@ let output = regex_replace_all!("U", text, "O");
 assert_eq!(&output, "OwO");
 ```
 
-# Switch over regexes
+# Switch over patterns
 
 Execute the expression bound to the first matching regex, with named captured groups declared as varibles:
 
 ```rust
 use lazy_regex::regex_switch;
+#[derive(Debug, PartialEq)]
 pub enum ScrollCommand {
     Top,
     Bottom,
     Lines(i32),
     Pages(i32),
+    JumpTo(String),
 }
 impl std::str::FromStr for ScrollCommand {
-    type Err = ();
-    fn from_str(s: &str) -> Result<Self, ()> {
+    type Err = &'static str;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         regex_switch!(s,
             "^scroll-to-top$" => Self::Top,
             "^scroll-to-bottom$" => Self::Bottom,
-            r#"^scroll-lines?\((?<n>[+-]?\d{1,4})\)$"# => Self::Lines(n.parse().unwrap()),
-            r#"^scroll-pages?\((?<n>[+-]?\d{1,4})\)$"# => Self::Pages(n.parse().unwrap()),
-        ).ok_or(())
+            r"^scroll-lines?\((?<n>[+-]?\d{1,4})\)$" => Self::Lines(n.parse().unwrap()),
+            r"^scroll-pages?\((?<n>[+-]?\d{1,4})\)$" => Self::Pages(n.parse().unwrap()),
+            r"^jump-to\((?<name>\w+)\)$" => Self::JumpTo(name.to_string()),
+        ).ok_or("unknown command")
     }
 }
+assert_eq!("scroll-lines(42)".parse(), Ok(ScrollCommand::Lines(42)));
+assert_eq!("scroll-lines(XLII)".parse::<ScrollCommand>(), Err("unknown command"));
 ```
 
 doc: [regex_switch!]
@@ -209,6 +213,7 @@ pub use {
         lazy_regex,
         regex,
         regex_captures,
+        regex_captures_iter,
         regex_find,
         regex_if,
         regex_is_match,
@@ -247,4 +252,5 @@ pub use {
         Captures, Regex, RegexBuilder,
     },
 };
+
 
