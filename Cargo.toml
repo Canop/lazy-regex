@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex"
-version = "3.3.0"
+version = "3.4.0"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2021"
 description = "lazy static regular expressions checked at compile time"
@@ -13,12 +13,12 @@ rust-version = "1.65"
 
 [dependencies]
 once_cell = "1.17"
-regex = {version = "1.9", default-features = false, optional = true}
+regex = {version = "1.11", default-features = false, optional = true}
 regex-lite = {version = "0.1", optional = true}
 
 [dependencies.lazy-regex-proc_macros]
 path = "src/proc_macros"
-version = "3.3.0"
+version = "3.4.0"
 
 [features]
 default = ["regex/default"]
