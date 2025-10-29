@@ -7,19 +7,20 @@ With lazy-regex macros, regular expressions
 * can hold flags as suffix: `let case_insensitive_regex = regex!("ab*"i);`
 * are defined in a less verbose way
 
-The [regex!] macro returns references to normal instances of [regex::Regex] or [regex::bytes::Regex] so all the usual features are available.
+The [`regex!`] macro returns references to normal instances of [`regex::Regex`] or [`regex::bytes::Regex`] so all the usual features are available.
 
 But most often, you won't even use the `regex!` macro but the other macros which are specialized for testing a match, replacing, or capturing groups in some common situations:
 
-* [Test a match](#test-a-match) with [regex_is_match!]
-* [Extract a value](#extract-a-value) with [regex_find!]
-* [Capture](#capture) with [regex_captures!] and [regex_captures_iter!]
-* [Replace with captured groups](#replace-with-captured-groups) with [regex_replace!] and [regex_replace_all!]
-* [Switch over patterns](#switch-over-patterns) with [regex_switch!]
+* [Test a match](#test-a-match) with [`regex_is_match!`]
+* [Extract a value](#extract-a-value) with [`regex_find!`]
+* [Capture](#capture) with [`regex_captures!`]
+* [Iter on captures](#iter-on-captures) with [`regex_captures_iter!`]
+* [Replace with captured groups](#replace-with-captured-groups) with [`regex_replace!`] and [`regex_replace_all!`]
+* [Switch over patterns](#switch-over-patterns) with [`regex_switch!`]
 
 They support the `B` flag for the `regex::bytes::Regex` variant.
 
-All macros exist with a `bytes_` prefix for building `bytes::Regex`, so you also have [bytes_regex!], [bytes_regex_is_match!], [bytes_regex_find!], [bytes_regex_captures!], [bytes_regex_replace!], [bytes_regex_replace_all!], and [bytes_regex_switch!].
+All macros exist with a `bytes_` prefix for building `bytes::Regex`, so you also have [`bytes_regex!`], [`bytes_regex_is_match!`], [`bytes_regex_find!`], [`bytes_regex_captures!`], [`bytes_regex_replace!`], [`bytes_regex_replace_all!`], and [`bytes_regex_switch!`].
 
 Some structs of the regex crate are reexported to ease dependency managment.
 
@@ -85,7 +86,7 @@ let b = bytes_regex_is_match!("[ab]+", b"car");
 assert_eq!(b, true);
 ```
 
-doc: [regex_is_match!]
+doc: [`regex_is_match!`]
 
 
 # Extract a value
@@ -99,7 +100,7 @@ let f_word = regex_find!(r"\bf\w+\b"B, b"The forest is silent.");
 assert_eq!(f_word, Some(b"forest" as &[u8]));
 ```
 
-doc: [regex_find!]
+doc: [`regex_find!`]
 
 # Capture
 
@@ -123,11 +124,31 @@ It's checked at compile time to ensure you have the right number of capturing gr
 
 You receive `""` for optional groups with no value.
 
-See [regex_captures!] and [regex_captures_iter!]
+See [`regex_captures!`]
+
+# Iter on captures
+
+```rust
+use lazy_regex::regex_captures_iter;
+
+let hay = "'Citizen Kane' (1941), 'The Wizard of Oz' (1939), 'M' (1931).";
+let mut movies = vec![];
+let iter = regex_captures_iter!(r"'([^']+)'\s+\(([0-9]{4})\)", hay);
+for (_, [title, year]) in iter.map(|c| c.extract()) {
+    movies.push((title, year.parse::<i64>().unwrap()));
+}
+assert_eq!(movies, vec![
+    ("Citizen Kane", 1941),
+    ("The Wizard of Oz", 1939),
+    ("M", 1931),
+]);
+```
+
+See [`regex_captures_iter!`]
 
 # Replace with captured groups
 
-The [regex_replace!] and [regex_replace_all!] macros bring once compilation and compilation time checks to the `replace` and `replace_all` functions.
+The [`regex_replace!`] and [`regex_replace_all!`] macros bring once compilation and compilation time checks to the `replace` and `replace_all` functions.
 
 ## Replace with a closure
 
@@ -185,16 +206,16 @@ assert_eq!("scroll-lines(42)".parse(), Ok(ScrollCommand::Lines(42)));
 assert_eq!("scroll-lines(XLII)".parse::<ScrollCommand>(), Err("unknown command"));
 ```
 
-doc: [regex_switch!]
+doc: [`regex_switch!`]
 
 # Shared lazy static
 
 When a regular expression is used in several functions, you sometimes don't want
 to repeat it but have a shared static instance.
 
-The [regex!] macro, while being backed by a lazy static regex, returns a reference.
+The [`regex!`] macro, while being backed by a lazy static regex, returns a reference.
 
-If you want to have a shared lazy static regex, use the [lazy_regex!] macro:
+If you want to have a shared lazy static regex, use the [`lazy_regex!`] macro:
 
 ```rust
 use lazy_regex::*;
@@ -204,7 +225,7 @@ pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
 
 Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
 
-doc: [lazy_regex!]
+doc: [`lazy_regex!`]
 
 */
 

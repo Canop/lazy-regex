@@ -41,8 +41,8 @@ where
 /// let case_insensitive_regex = regex!("^ab+$"i);
 /// ```
 ///
-/// The macro returns a reference to a [regex::Regex]
-/// or a [regex::bytes::Regex] instance,
+/// The macro returns a reference to a `regex::Regex`
+/// or a `regex::bytes::Regex` instance,
 /// differentiated by the `B` flag:
 /// ```
 /// let verbose = regex!(r#"_([\d\.]+)"#)
@@ -119,7 +119,7 @@ pub fn regex_is_match(input: TokenStream) -> TokenStream {
 }
 
 /// Test whether an expression matches a lazy static
-/// bytes::Regex regular expression (the regex is checked
+/// `bytes::Regex` regular expression (the regex is checked
 /// at compile time)
 ///
 /// Example:
@@ -300,7 +300,7 @@ pub fn bytes_regex_captures_iter(input: TokenStream) -> TokenStream {
     })
 }
 
-/// common implementation of regex_replace and regex_replace_all
+/// common implementation of `regex_replace` and `regex_replace_all`
 fn replacen(input: TokenStream, limit: usize) -> TokenStream {
     let parsed = parse_macro_input!(input as ReplaceArgs);
     let ReplaceArgs { regex_str, value, replacer } = parsed;
@@ -342,7 +342,7 @@ fn replacen(input: TokenStream, limit: usize) -> TokenStream {
     stream.into()
 }
 
-/// common implementation of bytes_regex_replace and bytes_regex_replace_all
+/// common implementation of `bytes_regex_replace` and `bytes_regex_replace_all`
 fn bytes_replacen(input: TokenStream, limit: usize) -> TokenStream {
     let parsed = parse_macro_input!(input as ReplaceArgs);
     let ReplaceArgs { regex_str, value, replacer } = parsed;
@@ -477,7 +477,7 @@ pub fn bytes_regex_replace_all(input: TokenStream) -> TokenStream {
     bytes_replacen(input, 0)
 }
 
-/// Return an Option<T>, with T being the type returned by the block or expression
+/// Return an `Option<T>`, with T being the type returned by the block or expression
 /// given as third argument.
 ///
 /// If the regex matches, executes the expression and return it as Some.
@@ -590,7 +590,7 @@ pub fn regex_switch(input: TokenStream) -> TokenStream {
         arms,
     } = parse_macro_input!(input as RexSwitchArgs);
     let mut q_arms = Vec::new();
-    for RexSwitchArmArgs { regex_str, then } in arms.into_iter() {
+    for RexSwitchArmArgs { regex_str, then } in arms {
         let regex_code = match RegexCode::from_lit_str(regex_str, false) {
             Ok(r) => r,
             Err(e) => {
@@ -660,7 +660,7 @@ pub fn bytes_regex_switch(input: TokenStream) -> TokenStream {
         arms,
     } = parse_macro_input!(input as RexSwitchArgs);
     let mut q_arms = Vec::new();
-    for RexSwitchArmArgs { regex_str, then } in arms.into_iter() {
+    for RexSwitchArmArgs { regex_str, then } in arms {
         let regex_code = match RegexCode::from_lit_str(regex_str, true) {
             Ok(r) => r,
             Err(e) => {

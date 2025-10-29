@@ -42,10 +42,10 @@ impl RegexCode {
                     // subspan only works on nighlty
                     return Err(syn::Error::new(
                         lit.subspan(pos - 1..pos).unwrap_or_else(|| lit.span()),
-                        format!("unrecognized regex flag {:?}", ch),
+                        format!("unrecognized regex flag {ch:?}"),
                     ));
                 }
-            };
+            }
         }
 
         let regex = if is_bytes {

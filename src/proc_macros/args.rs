@@ -29,7 +29,7 @@ impl Parse for RexValArgs {
 }
 
 /// Wrapping of the three arguments given to the
-/// ``regex_replace` and regex_replace_all` macros
+/// `regex_replace` and `regex_replace_all` macros
 pub(crate) struct ReplaceArgs {
     pub regex_str: LitStr,
     pub value: Expr,
@@ -63,7 +63,7 @@ impl Parse for ReplaceArgs {
     }
 }
 
-/// Wrapping of the arguments given to a regex_if macro
+/// Wrapping of the arguments given to a `regex_if` macro
 pub(crate) struct RexIfArgs {
     pub regex_str: LitStr,
     pub value: Expr, // this expression is (or produces) the text to search or check
@@ -86,7 +86,7 @@ impl Parse for RexIfArgs {
     }
 }
 
-/// Wrapping of the arguments given to a regex_switch macro
+/// Wrapping of the arguments given to a `regex_switch` macro
 pub(crate) struct RexSwitchArgs {
     pub value: Expr, // this expression is (or produces) the text to search or check
     pub arms: Vec<RexSwitchArmArgs>,
