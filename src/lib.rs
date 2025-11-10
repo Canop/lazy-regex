@@ -26,41 +26,58 @@ Some structs of the regex crate are reexported to ease dependency managment.
 
 # Build Regexes
 
-```rust
-use lazy_regex::regex;
+Build a simple regex:
 
-// build a simple regex
+```rust
+# use lazy_regex::regex;
 let r = regex!("sa+$");
 assert_eq!(r.is_match("Saa"), false);
+```
 
-// build a regex with flag(s)
+Build a regex with flag(s):
+
+```rust
+# use lazy_regex::regex;
 let r = regex!("sa+$"i);
 assert_eq!(r.is_match("Saa"), true);
+```
+You can use a raw literal:
 
-// you can use a raw literal
+```rust
+# use lazy_regex::regex;
 let r = regex!(r#"^"+$"#);
 assert_eq!(r.is_match("\"\""), true);
+```
 
-// or a raw literal with flag(s)
+Or a raw literal with flag(s):
+```rust
+# use lazy_regex::regex;
 let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
 assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
+```
 
-// build a regex that operates on &[u8]
+Build a regex that operates on `&[u8]`:
+```rust
+# use lazy_regex::regex;
 let r = regex!("(byte)?string$"B);
 assert_eq!(r.is_match(b"bytestring"), true);
+```
 
-// there's no problem using the multiline definition syntax
+There's no problem using the multiline definition syntax:
+```rust
+# use lazy_regex::regex;
 let r = regex!(r"(?x)
     (?P<name>\w+)
     -
     (?P<version>[0-9.]+)
 ");
 assert_eq!(r.find("This is lazy_regex-2.2!").unwrap().as_str(), "lazy_regex-2.2");
-// (look at the regex_captures! macro to easily extract the groups)
-
 ```
+
+(look at the `regex_captures!` macro to easily extract the groups)
+
+This line doesn't compile because the regex is invalid:
 ```compile_fail
-// this line doesn't compile because the regex is invalid:
 let r = regex!("(unclosed");
 
 ```
@@ -86,7 +103,7 @@ let b = bytes_regex_is_match!("[ab]+", b"car");
 assert_eq!(b, true);
 ```
 
-doc: [`regex_is_match!`]
+See [`regex_is_match!`]
 
 
 # Extract a value
@@ -100,7 +117,7 @@ let f_word = regex_find!(r"\bf\w+\b"B, b"The forest is silent.");
 assert_eq!(f_word, Some(b"forest" as &[u8]));
 ```
 
-doc: [`regex_find!`]
+See [`regex_find!`]
 
 # Capture
 
@@ -178,7 +195,7 @@ assert_eq!(&output, "OwO");
 
 # Switch over patterns
 
-Execute the expression bound to the first matching regex, with named captured groups declared as varibles:
+Execute the expression bound to the first matching regex, with named captured groups declared as variables:
 
 ```rust
 use lazy_regex::regex_switch;
@@ -206,7 +223,7 @@ assert_eq!("scroll-lines(42)".parse(), Ok(ScrollCommand::Lines(42)));
 assert_eq!("scroll-lines(XLII)".parse::<ScrollCommand>(), Err("unknown command"));
 ```
 
-doc: [`regex_switch!`]
+See [`regex_switch!`]
 
 # Shared lazy static
 
@@ -218,14 +235,14 @@ The [`regex!`] macro, while being backed by a lazy static regex, returns a refer
 If you want to have a shared lazy static regex, use the [`lazy_regex!`] macro:
 
 ```rust
-use lazy_regex::*;
+# use lazy_regex::*;
 
 pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
 ```
 
 Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
 
-doc: [`lazy_regex!`]
+See [`lazy_regex!`]
 
 */
 
