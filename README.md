@@ -69,7 +69,7 @@ let r = regex!(r#"^\s*("[a-t]*"\s*)+$"#i);
 assert_eq!(r.is_match(r#" "Aristote" "Platon" "#), true);
 ```
 
-Build a regex that operates on [`&[u8]`](https://doc.rust-lang.org/1.91.1/std/primitive.u8.html):
+Build a regex that operates on `&[u8]`:
 ```rust
 let r = regex!("(byte)?string$"B);
 assert_eq!(r.is_match(b"bytestring"), true);
