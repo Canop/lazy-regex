@@ -92,7 +92,7 @@ This line doesn't compile because the regex is invalid:
 let r = regex!("(unclosed");
 
 ```
-Supported regex flags: [`i`, `m`, `s`, `x`, `U`]regex::RegexBuilder, and you may also use `B` to build a bytes regex.
+Supported regex flags: [`i`, `m`, `s`, `x`, `U`](https://docs.rs/lazy-regex/latest/lazy_regex/struct.RegexBuilder.html), and you may also use `B` to build a bytes regex.
 
 The following regexes are equivalent:
 * `bytes_regex!("^ab+$"i)`
@@ -108,9 +108,9 @@ They're all case insensitive instances of `regex::bytes::Regex`.
 ```rust
 use lazy_regex::*;
 
-let b = regex_is_match!("ab+", "car");
+let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
-let b = bytes_regex_is_match!("ab+", b"car");
+let b = bytes_regex_is_match!("[ab]+", b"car");
 assert_eq!(b, true);
 ```
 
@@ -125,7 +125,7 @@ use lazy_regex::regex_find;
 let f_word = regex_find!(r"\bf\w+\b", "The fox jumps.");
 assert_eq!(f_word, Some("fox"));
 let f_word = regex_find!(r"\bf\w+\b"B, b"The forest is silent.");
-assert_eq!(f_word, Some(b"forest" as &[u8](https://docs.rs/lazy-regex/latest/lazy_regex/https://doc.rust-lang.org/1.91.1/std/primitive.u8.html)));
+assert_eq!(f_word, Some(b"forest" as &[u8]));
 ```
 
 See [`regex_find!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_find.html)
@@ -253,6 +253,7 @@ pub static GLOBAL_REX: Lazy<Regex> = lazy_regex!("^ab+$"i);
 Like for the other macros, the regex is static, checked at compile time, and lazily built at first use.
 
 See [`lazy_regex!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.lazy_regex.html)
+
 <!-- cradoc end -->
 
 
