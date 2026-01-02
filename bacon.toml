@@ -46,4 +46,3 @@ need_stdout = false
 on_success = "back" # so that we don't open the browser at each change
 
 [keybindings]
-d = "job:doc-open"

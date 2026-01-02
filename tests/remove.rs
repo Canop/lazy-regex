@@ -1,5 +1,6 @@
 use {
     lazy_regex::{
+        bytes_regex_remove,
         regex_remove,
     },
 };
@@ -23,3 +24,13 @@ fn test_regex_remove() {
     assert!(matches!(output, std::borrow::Cow::Borrowed("string")));
 }
 
+#[test]
+fn test_bytes_regex_remove() {
+    let input = b"154681string63731";
+
+    // removing at ends, no new bytes is created
+    let output = bytes_regex_remove!("^\\d+", input);
+    let output = bytes_regex_remove!("\\d+$", &output);
+    assert_eq!(&output[..], b"string");
+    assert!(matches!(output, std::borrow::Cow::Borrowed(b"string")));
+}

@@ -290,7 +290,10 @@ pub use {
         bytes_regex_switch,
     },
     once_cell::sync::Lazy,
-    remove::remove_match,
+    remove::{
+        remove_match,
+        bytes_remove_match,
+    },
 };
 
 #[cfg(not(feature = "lite"))]
@@ -318,6 +321,17 @@ macro_rules! regex_remove {
     ($rex:tt, $text:expr $(,)?) => {{
         let rex = $crate::regex!($rex);
         $crate::remove_match(
+            &rex,
+            $text,
+        )
+    }};
+}
+
+#[macro_export]
+macro_rules! bytes_regex_remove {
+    ($rex:tt, $text:expr $(,)?) => {{
+        let rex = $crate::bytes_regex!($rex);
+        $crate::bytes_remove_match(
             &rex,
             $text,
         )
