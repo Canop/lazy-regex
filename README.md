@@ -207,7 +207,7 @@ assert_eq!(&output, "OwO");
 
 # Remove part of a string
 
-`lazy_remove!` is cleaner than using `regex_replace!` with an empty string.
+`regex_remove!` is cleaner than using `regex_replace!` with an empty string.
 
 Contrary to replace, it doesn't allocate a new string if the match is at an end of the input, which makes it especially useful for trimming suffixes or prefixes.
 
