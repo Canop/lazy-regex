@@ -33,6 +33,7 @@ But most often, you won't even use the `regex!` macro but the other macros which
 * [Capture](#capture) with [`regex_captures!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_captures.html)
 * [Iter on captures](#iter-on-captures) with [`regex_captures_iter!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_captures_iter.html)
 * [Replace with captured groups](#replace-with-captured-groups) with [`regex_replace!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_replace.html) and [`regex_replace_all!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_replace_all.html)
+* [Remove part of a string](#remove-part-of-a-string) with [`regex_remove!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_remove.html)
 * [Switch over patterns](#switch-over-patterns) with [`regex_switch!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_switch.html)
 
 They support the `B` flag for the `regex::bytes::Regex` variant.
@@ -202,6 +203,24 @@ use lazy_regex::regex_replace_all;
 let text = "UwU";
 let output = regex_replace_all!("U", text, "O");
 assert_eq!(&output, "OwO");
+```
+
+# Remove part of a string
+
+`regex_remove!` is cleaner than using `regex_replace!` with an empty string.
+
+Contrary to replace, it doesn't allocate a new string if the match is at an end of the input, which makes it especially useful for trimming suffixes or prefixes.
+
+```rust
+use lazy_regex::regex_remove;
+
+let text = "lazy-regex-3.5.0";
+let name = regex_remove!(
+    r"-[0-9]+(\.[0-9]+)*$",
+    text,
+);
+assert_eq!(name, "lazy-regex");
+assert!(matches!(name, std::borrow::Cow::Borrowed(_)));
 ```
 
 # Switch over patterns

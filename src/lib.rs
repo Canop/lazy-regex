@@ -16,6 +16,7 @@ But most often, you won't even use the `regex!` macro but the other macros which
 * [Capture](#capture) with [`regex_captures!`]
 * [Iter on captures](#iter-on-captures) with [`regex_captures_iter!`]
 * [Replace with captured groups](#replace-with-captured-groups) with [`regex_replace!`] and [`regex_replace_all!`]
+* [Remove part of a string](#remove-part-of-a-string) with [`regex_remove!`]
 * [Switch over patterns](#switch-over-patterns) with [`regex_switch!`]
 
 They support the `B` flag for the `regex::bytes::Regex` variant.
@@ -193,6 +194,24 @@ let output = regex_replace_all!("U", text, "O");
 assert_eq!(&output, "OwO");
 ```
 
+# Remove part of a string
+
+`regex_remove!` is cleaner than using `regex_replace!` with an empty string.
+
+Contrary to replace, it doesn't allocate a new string if the match is at an end of the input, which makes it especially useful for trimming suffixes or prefixes.
+
+```rust
+use lazy_regex::regex_remove;
+
+let text = "lazy-regex-3.5.0";
+let name = regex_remove!(
+    r"-[0-9]+(\.[0-9]+)*$",
+    text,
+);
+assert_eq!(name, "lazy-regex");
+assert!(matches!(name, std::borrow::Cow::Borrowed(_)));
+```
+
 # Switch over patterns
 
 Execute the expression bound to the first matching regex, with named captured groups declared as variables:
@@ -246,6 +265,8 @@ See [`lazy_regex!`]
 
 */
 
+mod remove;
+
 pub use {
     lazy_regex_proc_macros::{
         lazy_regex,
@@ -269,6 +290,10 @@ pub use {
         bytes_regex_switch,
     },
     once_cell::sync::Lazy,
+    remove::{
+        remove_match,
+        bytes_remove_match,
+    },
 };
 
 #[cfg(not(feature = "lite"))]
@@ -291,4 +316,25 @@ pub use {
     },
 };
 
+#[macro_export]
+macro_rules! regex_remove {
+    ($rex:tt, $text:expr $(,)?) => {{
+        let rex = $crate::regex!($rex);
+        $crate::remove_match(
+            &rex,
+            $text,
+        )
+    }};
+}
+
+#[macro_export]
+macro_rules! bytes_regex_remove {
+    ($rex:tt, $text:expr $(,)?) => {{
+        let rex = $crate::bytes_regex!($rex);
+        $crate::bytes_remove_match(
+            &rex,
+            $text,
+        )
+    }};
+}
 
