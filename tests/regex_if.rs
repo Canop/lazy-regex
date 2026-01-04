@@ -1,6 +1,5 @@
 use {
     lazy_regex::{
-        bytes_regex_if,
         regex_if,
     },
     std::num::ParseIntError,
@@ -33,9 +32,10 @@ fn test_regex_if_with_error_handling() {
 }
 
 #[test]
+#[cfg(not(feature = "lite"))]
 fn test_bytes_regex_if() {
     fn extract_grey_level(s: &[u8]) -> Option<u16> {
-        bytes_regex_if!(
+        lazy_regex::bytes_regex_if!(
             r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#,
             s,
             std::str::from_utf8(level).unwrap().parse().unwrap()

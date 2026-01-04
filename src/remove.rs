@@ -32,6 +32,7 @@ pub fn remove_match<'s>(
 /// If the removed match is at the start or end of the input,
 /// a borrowed slice is returned.
 #[must_use]
+#[cfg(not(feature = "lite"))]
 pub fn bytes_remove_match<'s>(
     rex: &regex::bytes::Regex,
     text: &'s [u8],
