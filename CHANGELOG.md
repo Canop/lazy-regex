@@ -1,3 +1,8 @@
+
+<a name="v3.5.1"></a>
+### v3.5.1 - 2026-01-04
+- `regex_remove!` and `bytes_regex_remove!`
+
 <a name="v3.4.1"></a>
 ### v3.4.1 - 2024-12-27
 - regex_captures_iter! macro - Fix #37
