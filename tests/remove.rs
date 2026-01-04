@@ -1,8 +1,5 @@
 use {
-    lazy_regex::{
-        bytes_regex_remove,
-        regex_remove,
-    },
+    lazy_regex::*,
 };
 
 #[test]
@@ -25,6 +22,7 @@ fn test_regex_remove() {
 }
 
 #[test]
+#[cfg(not(feature = "lite"))]
 fn test_bytes_regex_remove() {
     let input = b"154681string63731";
 

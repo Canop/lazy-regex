@@ -56,6 +56,7 @@ fn test_regex_switch_with_error_handling() -> Result<(), ParseIntError> {
 }
 
 #[test]
+#[cfg(not(feature = "lite"))]
 fn test_bytes_regex_switch() {
     #[derive(Debug, PartialEq, Eq)]
     enum Color {
@@ -64,7 +65,7 @@ fn test_bytes_regex_switch() {
         Rgb(u8, u8, u8),
     }
     fn read(s: &[u8]) -> Option<Color> {
-        bytes_regex_switch!(s,
+        lazy_regex::bytes_regex_switch!(s,
             r#"^gr(a|e)y\((?<level>\d{1,2})\)$"#i => {
                 Color::Grey(std::str::from_utf8(level).unwrap().parse().unwrap())
             }
