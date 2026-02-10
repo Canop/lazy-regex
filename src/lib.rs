@@ -16,7 +16,7 @@ But most often, you won't even use the `regex!` macro but the other macros which
 * [Capture](#capture) with [`regex_captures!`]
 * [Iter on captures](#iter-on-captures) with [`regex_captures_iter!`]
 * [Replace with captured groups](#replace-with-captured-groups) with [`regex_replace!`] and [`regex_replace_all!`]
-* [Remove part of a string](#remove-part-of-a-string) with [`regex_remove!`]
+* [Remove part(s) of a string](#remove-part-of-a-string) with [`regex_remove!`] and [`regex_remove_all!`]
 * [Switch over patterns](#switch-over-patterns) with [`regex_switch!`]
 
 They support the `B` flag for the `regex::bytes::Regex` variant.
@@ -196,7 +196,7 @@ assert_eq!(&output, "OwO");
 
 # Remove part of a string
 
-`regex_remove!` is cleaner than using `regex_replace!` with an empty string.
+[`regex_remove!`] is cleaner than using `regex_replace!` with an empty string.
 
 Contrary to replace, it doesn't allocate a new string if the match is at an end of the input, which makes it especially useful for trimming suffixes or prefixes.
 
@@ -210,6 +210,20 @@ let name = regex_remove!(
 );
 assert_eq!(name, "lazy-regex");
 assert!(matches!(name, std::borrow::Cow::Borrowed(_)));
+```
+
+You can also remove all matches of a regex with [`regex_remove_all!`].
+
+Whenever possible, no new string is allocated and a borrowed slice is returned, even when several matches are removed
+(if they're all either at the start or end of the text).
+
+```rust
+use lazy_regex::regex_remove_all;
+
+let input = "154681string63731";
+let output = regex_remove_all!(r"\d", input);
+assert_eq!(output, "string");
+assert!(matches!(output, std::borrow::Cow::Borrowed("string")));
 ```
 
 # Switch over patterns
