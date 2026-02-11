@@ -125,6 +125,7 @@ pub fn remove_all_matches<'s>(
 /// When all matches are at the start or end of the input, no new
 /// String is allocated and a borrowed slice is returned.
 #[must_use]
+#[cfg(not(feature = "lite"))]
 pub fn bytes_remove_all_matches<'s>(
     rex: &regex::bytes::Regex,
     text: &'s [u8],
