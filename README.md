@@ -107,8 +107,6 @@ They're all case insensitive instances of `regex::bytes::Regex`.
 # Test a match
 
 ```rust
-use lazy_regex::*;
-
 let b = regex_is_match!("[ab]+", "car");
 assert_eq!(b, true);
 let b = bytes_regex_is_match!("[ab]+", b"car");
@@ -121,8 +119,6 @@ See [`regex_is_match!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex
 # Extract a value
 
 ```rust
-use lazy_regex::regex_find;
-
 let f_word = regex_find!(r"\bf\w+\b", "The fox jumps.");
 assert_eq!(f_word, Some("fox"));
 let f_word = regex_find!(r"\bf\w+\b"B, b"The forest is silent.");
@@ -134,8 +130,6 @@ See [`regex_find!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_fin
 # Capture
 
 ```rust
-use lazy_regex::regex_captures;
-
 let (_, letter) = regex_captures!("([a-z])[0-9]+"i, "form A42").unwrap();
 assert_eq!(letter, "A");
 
@@ -158,8 +152,6 @@ See [`regex_captures!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex
 # Iter on captures
 
 ```rust
-use lazy_regex::regex_captures_iter;
-
 let hay = "'Citizen Kane' (1941), 'The Wizard of Oz' (1939), 'M' (1931).";
 let mut movies = vec![];
 let iter = regex_captures_iter!(r"'([^']+)'\s+\(([0-9]{4})\)", hay);
@@ -182,8 +174,6 @@ The [`regex_replace!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_
 ## Replace with a closure
 
 ```rust
-use lazy_regex::regex_replace_all;
-
 let text = "Foo8 fuu3";
 let text = regex_replace_all!(
     r"\bf(\w+)(\d)"i,
@@ -199,7 +189,6 @@ If it doesn't match you get a clear error message at compilation time.
 ## Replace with another kind of Replacer
 
 ```rust
-use lazy_regex::regex_replace_all;
 let text = "UwU";
 let output = regex_replace_all!("U", text, "O");
 assert_eq!(&output, "OwO");
@@ -209,11 +198,9 @@ assert_eq!(&output, "OwO");
 
 [`regex_remove!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_remove.html) is cleaner than using `regex_replace!` with an empty string.
 
-Contrary to replace, it doesn't allocate a new string if the match is at an end of the input, which makes it especially useful for trimming suffixes or prefixes.
+Contrary to `replace`, lazy-regex removing macros don't allocate a new string if the match is at an end of the input, which makes it especially useful for trimming suffixes or prefixes.
 
 ```rust
-use lazy_regex::regex_remove;
-
 let text = "lazy-regex-3.5.0";
 let name = regex_remove!(
     r"-[0-9]+(\.[0-9]+)*$",
@@ -225,12 +212,17 @@ assert!(matches!(name, std::borrow::Cow::Borrowed(_)));
 
 You can also remove all matches of a regex with [`regex_remove_all!`](https://docs.rs/lazy-regex/latest/lazy_regex/macro.regex_remove_all.html).
 
+```rust
+assert_eq!(
+    regex_remove_all!(r"\s+", "    ab  c    d  e    "),
+    "abcde"
+);
+```
+
 Whenever possible, no new string is allocated and a borrowed slice is returned, even when several matches are removed
 (if they're all either at the start or end of the text).
 
 ```rust
-use lazy_regex::regex_remove_all;
-
 let input = "154681string63731";
 let output = regex_remove_all!(r"\d", input);
 assert_eq!(output, "string");

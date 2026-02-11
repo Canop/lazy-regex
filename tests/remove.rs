@@ -79,7 +79,11 @@ fn test_regex_remove_all() {
         "12345"
     );
     assert_eq!(
-        regex_remove_all!(r"\d", "a11b22c33d44e55"),
+        regex_remove_all!(r"\d", "a11b22c33333d44e55"),
+        "abcde"
+    );
+    assert_eq!(
+        regex_remove_all!(r"\s+", "    ab  c    d  e    "),
         "abcde"
     );
 }
@@ -93,4 +97,10 @@ fn test_bytes_regex_remove_all() {
     let output = bytes_regex_remove_all!(r"\d", input);
     assert_eq!(&output[..], b"string");
     assert!(matches!(output, std::borrow::Cow::Borrowed(b"string")));
+
+    // removing several matches
+    assert_eq!(
+        *bytes_regex_remove_all!(r"\s+", b"    ab  c    d  e    "),
+        *b"abcde"
+    );
 }
