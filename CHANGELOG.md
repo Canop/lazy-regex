@@ -1,4 +1,9 @@
 
+<a name="v3.6.0"></a>
+### v3.6.0 - 2026-02-11
+- `regex_remove_all!` and `bytes_regex_remove_all!`
+- MSRV updated to 1.71
+
 <a name="v3.5.1"></a>
 ### v3.5.1 - 2026-01-04
 - `regex_remove!` and `bytes_regex_remove!`

@@ -1,10 +1,10 @@
 [package]
 name = "lazy-regex-proc_macros"
-version = "3.5.1"
+version = "3.6.0"
 authors = ["Canop <cano.petrole@gmail.com>"]
 description = "proc macros for the lazy_regex crate"
 license = "MIT"
-edition = "2018"
+edition = "2021"
 repository = "https://github.com/Canop/lazy-regex/tree/main/src/proc_macros"
 
 [dependencies]

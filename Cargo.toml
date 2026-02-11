@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex"
-version = "3.5.1"
+version = "3.6.0"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2021"
 description = "lazy static regular expressions checked at compile time"
@@ -9,7 +9,7 @@ license = "MIT"
 categories = ["text-processing"]
 repository = "https://github.com/Canop/lazy-regex"
 readme = "README.md"
-rust-version = "1.65"
+rust-version = "1.71"
 
 [dependencies]
 once_cell = "1.21"
@@ -18,7 +18,7 @@ regex-lite = {version = "0.1", optional = true}
 
 [dependencies.lazy-regex-proc_macros]
 path = "src/proc_macros"
-version = "3.5.1"
+version = "3.6.0"
 
 [features]
 default = ["regex/default"]
