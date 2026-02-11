@@ -107,7 +107,6 @@ pub fn remove_all_matches<'s>(
             } else {
                 // There's no more matches, and we're not at the end of the input, so we need to
                 // create a new string because there's a hole in the middle of the input
-                dbg!(trim_start_end, rem_start, m.end(), text.len());
                 let len = (rem_start - trim_start_end) + (text.len() - m.end());
                 let mut string = String::with_capacity(len);
                 string.push_str(&text[trim_start_end..rem_start]);
@@ -118,7 +117,6 @@ pub fn remove_all_matches<'s>(
     }
     Cow::Borrowed(&text[trim_start_end..])
 }
-
 
 /// Remove all matches of the regex from the text.
 ///
@@ -176,7 +174,6 @@ pub fn bytes_remove_all_matches<'s>(
             } else {
                 // There's no more matches, and we're not at the end of the input, so we need to
                 // create a new string because there's a hole in the middle of the input
-                dbg!(trim_start_end, rem_start, m.end(), text.len());
                 let len = (rem_start - trim_start_end) + (text.len() - m.end());
                 let mut string = Vec::with_capacity(len);
                 string.extend_from_slice(&text[trim_start_end..rem_start]);
