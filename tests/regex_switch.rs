@@ -1,3 +1,5 @@
+#![deny(unreachable_code)]
+
 use {
     lazy_regex::*,
     std::num::ParseIntError,
@@ -82,4 +84,33 @@ fn test_bytes_regex_switch() {
     assert_eq!(read(b"pinkie"), Some(Color::Pink));
     assert_eq!(read(b"red"), None);
     assert_eq!(read(b"rgb(1,2,3)"), Some(Color::Rgb(1, 2, 3)));
+}
+
+#[test]
+fn test_regex_switch_with_early_return() {
+    #[allow(clippy::diverging_sub_expression)]
+    fn read(s: &str) -> Result<Option<&'static str>, ()> {
+        Ok(regex_switch!(s,
+            "^error$" => return Err(()),
+            "^ok$" => "ok",
+        ))
+    }
+
+    assert_eq!(read("error"), Err(()));
+    assert_eq!(read("ok"), Ok(Some("ok")));
+}
+
+#[test]
+#[cfg(not(feature = "lite"))]
+fn test_bytes_regex_switch_with_early_return() {
+    #[allow(clippy::diverging_sub_expression)]
+    fn read(s: &[u8]) -> Result<Option<&'static [u8]>, ()> {
+        Ok(bytes_regex_switch!(s,
+            "^error$" => return Err(()),
+            "^ok$" => &b"ok"[..],
+        ))
+    }
+
+    assert_eq!(read(b"error"), Err(()));
+    assert_eq!(read(b"ok"), Ok(Some(&b"ok"[..])));
 }

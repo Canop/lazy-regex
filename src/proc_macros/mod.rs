@@ -609,8 +609,9 @@ pub fn regex_switch(input: TokenStream) -> TokenStream {
                 #statick;
                 if let Some(caps) = RE.captures(#value) {
                     #(#assigns);*
-                    let output = Some(#then);
-                    break 'switch output;
+                    let output = #then;
+                    #[allow(unreachable_code)]
+                    break 'switch Some(output);
                 }
             }}
         );
@@ -679,8 +680,9 @@ pub fn bytes_regex_switch(input: TokenStream) -> TokenStream {
                 #statick;
                 if let Some(caps) = RE.captures(#value) {
                     #(#assigns);*
-                    let output = Some(#then);
-                    break 'switch output;
+                    let output = #then;
+                    #[allow(unreachable_code)]
+                    break 'switch Some(output);
                 }
             }}
         );
