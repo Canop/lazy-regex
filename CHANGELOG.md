@@ -1,3 +1,5 @@
+### next
+- fix non relevant "unreachable_code" warning in regex_switch - Fix #40 - Thanks @Guflly
 
 <a name="v3.6.0"></a>
 ### v3.6.0 - 2026-02-11
