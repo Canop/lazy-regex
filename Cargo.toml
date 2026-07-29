@@ -1,6 +1,6 @@
 [package]
 name = "lazy-regex"
-version = "3.6.0"
+version = "3.6.1"
 authors = ["Canop <cano.petrole@gmail.com>"]
 edition = "2021"
 description = "lazy static regular expressions checked at compile time"
@@ -13,12 +13,12 @@ rust-version = "1.71"
 
 [dependencies]
 once_cell = "1.21"
-regex = {version = "1.12", default-features = false, optional = true}
+regex = {version = "1.13", default-features = false, optional = true}
 regex-lite = {version = "0.1", optional = true}
 
 [dependencies.lazy-regex-proc_macros]
 path = "src/proc_macros"
-version = "3.6.0"
+version = "3.6.1"
 
 [features]
 default = ["regex/default"]
@@ -40,3 +40,6 @@ unicode-segment = ["regex/unicode-segment"]
 
 [workspace]
 members = ["src/proc_macros", "examples/regexes"]
+
+[lints.clippy]
+while_let_loop = "allow"

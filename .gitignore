@@ -1,2 +1,5 @@
 target
 Cargo.lock
+
+# website isn't really needed at the moment
+/website 
