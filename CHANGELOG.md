@@ -1,3 +1,7 @@
+### next
+- `syn` dependency updated to 3.0 - Thanks @hwright
+- fix "unreachable_code" warning in regex_switch still emitted by rustc < 1.83
+
 <a name="v3.6.1"></a>
 ### v3.6.1 - 2026-02-11
 - fix non relevant "unreachable_code" warning in regex_switch - Fix #40 - Thanks @Guflly

@@ -611,7 +611,7 @@ pub fn regex_switch(input: TokenStream) -> TokenStream {
                     #(#assigns);*
                     let output = #then;
                     #[allow(unreachable_code)]
-                    break 'switch Some(output);
+                    { break 'switch Some(output) }
                 }
             }}
         );
@@ -682,7 +682,7 @@ pub fn bytes_regex_switch(input: TokenStream) -> TokenStream {
                     #(#assigns);*
                     let output = #then;
                     #[allow(unreachable_code)]
-                    break 'switch Some(output);
+                    { break 'switch Some(output) }
                 }
             }}
         );
