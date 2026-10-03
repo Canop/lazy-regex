@@ -278,6 +278,9 @@ See [`lazy_regex!`]
 
 */
 
+#[cfg(not(any(feature = "regex", feature = "lite")))]
+compile_error!("lazy-regex needs either a regex feature (e.g. \"std\") or the \"lite\" feature");
+
 mod remove;
 
 pub use {
