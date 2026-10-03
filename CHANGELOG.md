@@ -1,5 +1,6 @@
-### next
-- `syn` dependency updated to 3.0 - Thanks @hwright
+<a name="v3.6.2"></a>
+### v3.6.2 - 2026-10-03
+- `syn` dependency updated to 3.0. Lighten compilation for programs already importing syn 3 (serde, this_error, etc.) - Thanks @hwright
 - fix "unreachable_code" warning in regex_switch still emitted by rustc < 1.83
 - explicit compilation error when neither a regex feature nor "lite" is enabled
 
